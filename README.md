@@ -5,7 +5,13 @@
     <a href="README.md"> English </a> | <a>中文</a> 
   </p>
 </div>
+
+
+![ubuntu](https://img.shields.io/badge/Ubuntu-20.04-orange.svg)
+
 ![ros](https://img.shields.io/badge/ROS-noetic-blue.svg)
+
+
 
 ## 0.介绍
 
