@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd ../../lib &&
+cd /home/agilex/pika_ros/install/lib &&
 ./survive-cli
