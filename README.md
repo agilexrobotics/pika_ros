@@ -29,13 +29,37 @@ Pika具备超高精度的**毫米级空间信息采集能力**，支持采集数
 
 ### 1.1 软件环境部署准备
 
-安装ROS1-noetic，推荐使用fishros按照提示安装
+1、安装ROS1-noetic
+推荐使用fishros按照提示安装
 
 ```bash
 cd ~ && wget http://fishros.com/install -O fishros && . fishros
 ```
 
-安装Realsense-sdk
+2、克隆代码
+
+```bash
+git clone git@github.com:agilexrobotics/pika_ros.git
+```
+
+3、安装依赖
+
+```bash
+sudo apt-get update && sudo apt install libjsoncpp-dev ros-noetic-ddynamic-reconfigure libpcap-dev  ros-noetic-serial ros-noetic-ros-numpy python3-pcl libqt5serialport5  build-essential zlib1g-dev libx11-dev libusb-1.0-0-dev freeglut3-dev liblapacke-dev libopenblas-dev libatlas-base-dev cmake  git libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev 
+```
+
+4、配置USB规则
+在pika_ros路径下执行：
+
+```bash
+sudo cp scripts/81-vive.rules /etc/udev/rules.d/
+
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+5、安装Realsense-sdk
+该步骤需要科学上网，请自行配置。
+进入pika_ros/source，将librealsense-2.50.0.zip解压，运行
 
 ```bash
 cd librealsense-2.50.0 
@@ -43,30 +67,39 @@ cd librealsense-2.50.0
 bash install.bash
 ```
 
-安装依赖
+将source目录下的install.zip压缩包放入~/pika_ros 目录下。
+给install目录加执行权限：
 
 ```bash
-sudo apt-get update && sudo apt install libjsoncpp-dev ros-noetic-ddynamic-reconfigure libpcap-dev  ros-noetic-serial ros-noetic-ros-numpy python3-pcl libqt5serialport5  build-essential zlib1g-dev libx11-dev  freeglut3-dev liblapacke-dev libopenblas-dev libatlas-base-dev cmake  git libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev 
+chmod 777 -R install/
 ```
 
-将install.zip压缩包放入~/pika_ws 目录下。
-
-编译工作空间
+6、添加环境变量
 
 ```bash
-cd pika_ws/ 
-
-catkin_make install
+echo 'source ~/pika_ros/install/setup.bash' >> ~/.bashrc
 ```
+
+pika_ros文件存放架构如下：
+
+```bash
+├── img
+├── install
+├── README.md
+├── scripts
+└── source
+```
+
+至此，软件代码配置完毕。
 
 ### 1.2 定位基站校准
 
 若是第一次部署定位基站，或者定位基站发生了移动，定位效果不好，都应该进行校准:
 
 ```bash
-cd ~/pika_ws/install/share/pika_locator
+cd ~/pika_ros/scripts/
 
-./script/calibration.sh
+./calibration.bash
 ```
 
 ![img](img/image_1.png)
@@ -112,7 +145,7 @@ udevadm info /dev/ttyUSB0
 先插入左夹持器USB至工控机（确保工控机只连接一个设备），读取左臂鱼眼摄像头端口
 
 ```bash
-cd ~/pika_ws/
+cd ~/pika_ros/scripts
 
 source install/setup.bash
 
@@ -152,7 +185,7 @@ rs-enumerate-devices
 最终，运行
 
 ```bash
-gedit ~/pika_ws/install/share/sensor_tools/scripts/setup.bash
+gedit ~/pika_ros/scripts/setup.bash
 ```
 
 结果如下：
@@ -164,9 +197,9 @@ gedit ~/pika_ws/install/share/sensor_tools/scripts/setup.bash
 之后，运行
 
 ```bash
-bash ~/pika_ws/install/share/sensor_tools/scripts/setup.bash
+bash ~/pika_ros/scripts/setup.bash
 
-gedit ~/pika_ws/install/share/sensor_tools/scripts/start_multi_sensor.bash
+gedit ~/pika_ros/scripts/start_multi_sensor.bash
 ```
 
 结果如下：
@@ -194,8 +227,11 @@ roslaunch pika_locator get_code.launch
 4、随后将下面代码填入 .bashrc 文件中：
 
 ```bash
-export pika_L_code=LHR-EB902458
-export pika_R_code=LHR-FE98B2BE
+echo 'export pika_L_code=LHR-EB902458' >> ~/.bashrc
+
+echo 'export pika_R_code=LHR-FE98B2BE' >> ~/.bashrc
+
+source ~/.bashrc
 ```
 
 如果 .bashrc 文件已经存在 pika_L_code、pika_R_code，只需将值修改即可。
@@ -228,7 +264,7 @@ roslaunch pika_locator pika_double_tracker.launch
 运行：
 
 ```bash
-gedit ~/pika_ws/install/share/sensor_tools/scripts/start_multi_sensor.bash
+gedit ~/pika_ros/scripts/start_multi_sensor.bash
 ```
 
 结果如下：
@@ -258,7 +294,7 @@ conda deactivate
 开启鱼眼摄像头、夹爪编码器以及pikaDepthCamera
 
 ```bash
-cd ~/pika_ws/install/share/sensor_tools/scripts/
+cd ~/pika_ros/scripts/
 
 bash start_sensor.bash  # 单夹持器
 
@@ -278,7 +314,7 @@ bash start_multi_sensor.bash  # 双夹持器
 运行以下命令进行数据采集。其中datasetDir参数为数据目录；episodeIndex参数为数据组别，通常采用每组数据递增方式，设置为0即为第0组。
 
 ```bash
-source ~/pika_ws/install/setup.sh 
+source ~/pika_ros/install/setup.sh 
 roslaunch data_tools run_data_capture.launch datasetDir:=/home/agilex/data episodeIndex:=0  # 单夹持器
 roslaunch data_tools run_multi_data_capture.launch datasetDir:=/home/agilex/data episodeIndex:=0  # 双夹持器
 datasetDir:=/home/agilex/data/episode0
@@ -339,7 +375,7 @@ done
 运行以下命令进行数据同步。其中datasetDir参数为数据目录；episodeIndex参数为需要同步数据的组别，若为-1则同步datasetDir目录下的所有数据组。
 
 ```bash
-source ~/pika_ws/install/setup.sh 
+source ~/pika_ros/install/setup.sh 
 roslaunch data_tools run_data_sync.launch datasetDir:=/home/agilex/data/ episodeIndex:=-1  # 单夹持器
 roslaunch data_tools run_multi_data_sync.launch datasetDir:=/home/agilex/data/ episodeIndex:=-1  # 双夹持器
 ```
@@ -359,7 +395,7 @@ sync.txt文件说明：
 运行以下命令在每个episode路径下生成data.hdf5文件。其中datasetDir参数为数据目录。
 
 ```bash
-cd ~/pika_ws/install/share/data_tools/scripts
+cd ~/pika_ros/scripts
 python3 data_to_hdf5.py --datasetDir /home/agilex/data/  # 单夹持器
 python3 multi_data_to_hdf5.py --datasetDir /home/agilex/data/  # 双夹持器
 ```
@@ -389,7 +425,7 @@ data.hdf5文件包含同步的图像路径索引、位姿数据等。
 运行以下命令以读取sync.txt的方式进行数据重播。其中datasetDir参数为数据目录；episodeIndex参数为需要重播的数据组别。
 
 ```bash
-source ~/pika_ws/install/setup.sh
+source ~/pika_ros/install/setup.sh
 roslaunch data_tools run_data_publish.launch datasetDir:=/home/agilex/data/ episodeIndex:=0  # 单夹持器
 roslaunch data_tools run_multi_data_publish.launch datasetDir:=/home/agilex/data/ episodeIndex:=0  # 双夹持器
 ```
@@ -398,7 +434,7 @@ roslaunch data_tools run_multi_data_publish.launch datasetDir:=/home/agilex/data
 
 ```bash
 roscore
-cd ~/pika_ws/install/share/data_tools/scripts
+cd ~/pika_ros/scripts/
 python3 data_publish.py --datasetDir /home/agilex/data/ --episodeIndex 0  # 单夹持器
 python3 data_publish.py --datasetDir /home/agilex/data/ --episodeIndex 0  # 双夹持器
 ```
@@ -409,7 +445,7 @@ python3 data_publish.py --datasetDir /home/agilex/data/ --episodeIndex 0  # 双�
 
 在训练过程中加载数据
 
-提供一个加载数据的示例，可以参照~/pika_ws/install/share/data_tools/scripts/load_data_example.py文件进行修改，运行以下命令测试加载数据。其中datasetDir参数为数据目录。
+提供一个加载数据的示例，可以参照~/pika_ros/scripts/load_data_example.py文件进行修改，运行以下命令测试加载数据。其中datasetDir参数为数据目录。
 
 ```bash
 python load_data_example.py --datasetDir /home/agilex/data/
@@ -417,12 +453,12 @@ python load_data_example.py --datasetDir /home/agilex/data/
 
 ## 4. pika gripper的使用
 
-使用执行器之前，请确保执行器电源已经上电。若使用左右双执行器，请参照设置左右手摄像头进行左右执行器USB设置，修改文件~/pika_ws/install/share/sensor_tools/scripts/setup.bash 以及 gedit ~/pika_ws/install/share/sensor_tools/scripts/start_multi_gripper.bash。
+使用执行器之前，请确保执行器电源已经上电。若使用左右双执行器，请参照设置左右手摄像头进行左右执行器USB设置，修改文件~/pika_ros/scripts/setup.bash 以及 gedit ~/pika_ros/scripts/start_multi_gripper.bash。
 
 之后，开启鱼眼摄像头、pikaDepthCamera和电机控制串口：
 
 ```bash
-cd ~/pika_ws/install/share/sensor_tools/scripts/
+cd ~/pika_ros/scripts/
 bash start_gripper.bash  # single gripper
 bash start_multi_gripper.bash  # double gripper
 ```
