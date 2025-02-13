@@ -94,7 +94,7 @@ pika_ros文件存放架构如下：
 
 ### 1.2 定位基站校准
 
-若是第一次部署定位基站，或者定位基站发生了移动，定位效果不好，都应该进行校准:
+若是第一次部署定位基站，或者定位基站发生了移动，或者定位效果不好，或者切换了频道，都应该进行校准，运行下列指令对定位标签进行校准:
 
 ```bash
 cd ~/pika_ros/scripts/
@@ -102,9 +102,22 @@ cd ~/pika_ros/scripts/
 ./calibration.bash
 ```
 
-![img](img/image_1.png)
+启动校准程序后，确保追踪器在两个定位基站的定位范围内，正常的校准过程需要花 10 s 左右，看到终端显示下面信息时：
 
-启动校准程序后，确保追踪器在两个定位基站的定位范围内，当看到终端显示 Got OOTX packet 字样时，就代表校准完成。
+```bash
+Info: MPFIT success 283446.053347/90.8577511297/0.0000793 (81 measurements, 1, MP_OK_CHI, 5 iters, up err 0.0002793, trace 0.0000035)
+Info: Global solve with 2 scenes for 0 with error of 283446.053347/90.8577511297 (acc err 0.0013)
+Info: Global solve with 2 scenes for 3 with error of 283446.053347/90.8577511297 (acc err 0.0007)
+Info: Using LH 3 (80fb5703) as reference lighthouse
+Info: MPFIT success 145.370101/114.4120840723/0.0000773 (121 measurements, 1, MP_OK_CHI, 34 iters, up err 0.0001909, trace 0.0000071)
+Info: Global solve with 3 scenes for 0 with error of 145.370101/114.4120840723 (acc err 0.0015)
+Info: Global solve with 3 scenes for 3 with error of 145.370101/114.4120840723 (acc err 0.0007)
+Info: Using LH 3 (80fb5703) as reference lighthouse
+```
+
+按下 Ctrl+C 关闭校准程序，当看到终端显示 seed runs 有发送数据且 error failures 的数量为 0 时，就代表校准完成。如下图所示：
+
+![img](img/image_1.png)
 
 注意：
 

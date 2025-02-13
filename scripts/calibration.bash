@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd /home/agilex/pika_ros/install/lib &&
-./survive-cli
+./survive-cli  --force-calibrate
