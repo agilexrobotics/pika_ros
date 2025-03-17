@@ -78,6 +78,11 @@ class Operator:
         self.imu9AxisSyncDirs = [os.path.join(self.imu9AxisDirs[i], "sync.txt") for i in range(len(self.args.imu9AxisNames))]
         self.lidarPointCloudSyncDirs = [os.path.join(self.lidarPointCloudDirs[i], "sync.txt") for i in range(len(self.args.lidarPointCloudNames))]
         self.robotBaseVelSyncDirs = [os.path.join(self.robotBaseVelDirs[i], "sync.txt") for i in range(len(self.args.robotBaseVelNames))]
+
+        self.cameraColorConfigDirs = [os.path.join(self.cameraColorDirs[i], "config.json") for i in range(len(self.args.cameraColorNames))]
+        self.cameraDepthConfigDirs = [os.path.join(self.cameraDepthDirs[i], "config.json") for i in range(len(self.args.cameraDepthNames))]
+        self.cameraPointCloudConfigDirs = [os.path.join(self.cameraPointCloudDirs[i], "config.json") for i in range(len(self.args.cameraPointCloudNames))]
+
         self.instructionsDir = os.path.join(self.args.datasetDir, "instructions.npy")
         self.dataFile = os.path.join(self.episodeDir, "data.hdf5")
 
@@ -85,10 +90,16 @@ class Operator:
         data_dict = {}
         for cameraColorName in self.args.cameraColorNames:
             data_dict[f'camera/color/{cameraColorName}'] = []
+            data_dict[f'camera/colorIntrinsic/{cameraColorName}'] = []
+            data_dict[f'camera/colorExtrinsic/{cameraColorName}'] = []
         for cameraDepthName in self.args.cameraDepthNames:
             data_dict[f'camera/depth/{cameraDepthName}'] = []
+            data_dict[f'camera/depthIntrinsic/{cameraDepthName}'] = []
+            data_dict[f'camera/depthExtrinsic/{cameraDepthName}'] = []
         for cameraPointCloudName in self.args.cameraPointCloudNames:
             data_dict[f'camera/pointCloud/{cameraPointCloudName}'] = []
+            data_dict[f'camera/pointCloudIntrinsic/{cameraPointCloudName}'] = []
+            data_dict[f'camera/pointCloudExtrinsic/{cameraPointCloudName}'] = []
         for armJointStateName in self.args.armJointStateNames:
             data_dict[f'arm/jointStateVelocity/{armJointStateName}'] = []
             data_dict[f'arm/jointStatePosition/{armJointStateName}'] = []
@@ -122,6 +133,12 @@ class Operator:
                     count += 1
                 if size_count == 0:
                     size_count = count
+            with open(self.cameraColorConfigDirs[i], 'r') as color_config_file:
+                data = json.load(color_config_file)
+                color_intrinsic = np.array(data["K"]).reshape(3, 3)
+                color_extrinsic = create_transformation_matrix(data["parent_frame"]['x'],  data["parent_frame"]['y'], data["parent_frame"]['z'], data["parent_frame"]['roll'], data["parent_frame"]['pitch'], data["parent_frame"]['yaw'])
+                data_dict[f'camera/colorIntrinsic/{self.args.cameraColorNames[i]}'] = color_intrinsic
+                data_dict[f'camera/colorExtrinsic/{self.args.cameraColorNames[i]}'] = color_extrinsic
         for i in range(len(self.args.cameraDepthNames)):
             with open(self.cameraDepthSyncDirs[i], 'r') as lines:
                 count = 0
@@ -134,6 +151,12 @@ class Operator:
                     count += 1
                 if size_count == 0:
                     size_count = count
+            with open(self.cameraDepthConfigDirs[i], 'r') as depth_config_file:
+                data = json.load(depth_config_file)
+                depth_intrinsic = np.array(data["K"]).reshape(3, 3)
+                depth_extrinsic = create_transformation_matrix(data["parent_frame"]['x'],  data["parent_frame"]['y'], data["parent_frame"]['z'], data["parent_frame"]['roll'], data["parent_frame"]['pitch'], data["parent_frame"]['yaw'])
+                data_dict[f'camera/depthIntrinsic/{self.args.cameraDepthNames[i]}'] = depth_intrinsic
+                data_dict[f'camera/depthExtrinsic/{self.args.cameraDepthNames[i]}'] = depth_extrinsic
         for i in range(len(self.args.cameraPointCloudNames)):
             with open(self.cameraPointCloudSyncDirs[i], 'r') as lines:
                 count = 0
@@ -143,6 +166,12 @@ class Operator:
                     count += 1
                 if size_count == 0:
                     size_count = count
+            with open(self.cameraPointCloudConfigDirs[i], 'r') as point_cloud_config_file:
+                data = json.load(point_cloud_config_file)
+                point_cloud_intrinsic = np.array(data["K"]).reshape(3, 3)
+                point_cloud_extrinsic = create_transformation_matrix(data["parent_frame"]['x'], data["parent_frame"]['y'], data["parent_frame"]['z'], data["parent_frame"]['roll'], data["parent_frame"]['pitch'], data["parent_frame"]['yaw'])
+                data_dict[f'camera/pointCloudIntrinsic/{self.args.cameraPointCloudNames[i]}'] = point_cloud_intrinsic
+                data_dict[f'camera/pointCloudExtrinsic/{self.args.cameraPointCloudNames[i]}'] = point_cloud_extrinsic
         for i in range(len(self.args.armJointStateNames)):
             with open(self.armJointStateSyncDirs[i], 'r') as lines:
                 count = 0
@@ -245,6 +274,8 @@ def get_arguments():
                         default=['pikaDepthCamera_l', 'pikaDepthCamera_r'], required=False)
     parser.add_argument('--cameraPointCloudNames', action='store', type=str, help='cameraPointCloudNames',
                         default=['pikaDepthCamera_l', 'pikaDepthCamera_r'], required=False)
+    parser.add_argument('--useCameraPointCloud', action='store', type=bool, help='useCameraPointCloud',
+                        default=True, required=False)
     parser.add_argument('--useCameraPointCloudNormalization', action='store', type=bool, help='useCameraPointCloudNormalization',
                         default=True, required=False)
     parser.add_argument('--armJointStateNames', action='store', type=str, help='armJointStateNames',
@@ -267,6 +298,8 @@ def get_arguments():
 
 def main():
     args = get_arguments()
+    if not args.useCameraPointCloud:
+        args.cameraPointCloudNames = []
     if args.episodeIndex == -1:
         for f in os.listdir(args.datasetDir):
             if f.startswith("episode") and not f.endswith(".tar.gz"):

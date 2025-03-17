@@ -24,7 +24,7 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import PointCloud2, PointField, Imu
-# from sensor_tools import Gripper
+from data_msgs.msg import Gripper
 from sensor_msgs import point_cloud2
 from nav_msgs.msg import Odometry
 from cv_bridge import CvBridge, CvBridgeError
@@ -79,25 +79,26 @@ def process_data(args, ros_operator):
                     else:
                         ros_operator.publish_camera_depth(j, root[f'/camera/depth/{args.camera_depth_names[j]}'][i])
                 for j in range(len(args.camera_point_cloud_names)):
-                    if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                        ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
-                    else:
-                        if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                            pc = np.load(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))
+                    if f'/lidar/pointCloud/{args.camera_point_cloud_names[j]}' in root.keys():
+                        if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
+                            ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
                         else:
-                            pc = root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i]
-                        rgb = (pc[:, 3]).astype(np.uint32)*(2**16) + (pc[:, 4]).astype(np.uint32)*(2**8) + (pc[:, 5]).astype(np.uint32)
-                        dtype = [('x', np.float32), ('y', np.float32), ('z', np.float32), ('rgb', np.uint32)]
-                        points = np.zeros(rgb.shape[0], dtype=dtype)
-                        points['x'] = pc[:, 0]
-                        points['y'] = pc[:, 1]
-                        points['z'] = pc[:, 2]
-                        points['rgb'] = rgb
-                        # pc[:, 3] = rgb
-                        # rgb = rgb[:, np.newaxis]
-                        # pc = np.concatenate([pc[:, :3], rgb], axis=1).astype(np.float32)
-                        # print(pc)
-                        ros_operator.publish_camera_point_cloud(j, points)
+                            if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
+                                pc = np.load(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))
+                            else:
+                                pc = root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i]
+                            rgb = (pc[:, 3]).astype(np.uint32)*(2**16) + (pc[:, 4]).astype(np.uint32)*(2**8) + (pc[:, 5]).astype(np.uint32)
+                            dtype = [('x', np.float32), ('y', np.float32), ('z', np.float32), ('rgb', np.uint32)]
+                            points = np.zeros(rgb.shape[0], dtype=dtype)
+                            points['x'] = pc[:, 0]
+                            points['y'] = pc[:, 1]
+                            points['z'] = pc[:, 2]
+                            points['rgb'] = rgb
+                            # pc[:, 3] = rgb
+                            # rgb = rgb[:, np.newaxis]
+                            # pc = np.concatenate([pc[:, :3], rgb], axis=1).astype(np.float32)
+                            # print(pc)
+                            ros_operator.publish_camera_point_cloud(j, points)
                 for j in range(len(args.arm_joint_state_names)):
                     ros_operator.publish_arm_joint_state(j, root[f'/arm/jointStatePosition/{args.arm_joint_state_names[j]}'][i])
                 for j in range(len(args.arm_end_pose_names)):
@@ -109,18 +110,19 @@ def process_data(args, ros_operator):
                 for j in range(len(args.imu_9axis_names)):
                     ros_operator.publish_imu_9axis(j, root[f'/imu/9axisOrientation/{args.imu_9axis_names[j]}'][i], root[f'/imu/9axisAngularVelocity/{args.imu_9axis_names[j]}'][i], root[f'/imu/9axisLinearAcceleration/{args.imu_9axis_names[j]}'][i])
                 for j in range(len(args.lidar_point_cloud_names)):
-                    if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                        ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
-                    else:
-                        if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                            pc = np.load(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))
+                    if f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}' in root.keys():
+                        if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
+                            ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
                         else:
-                            pc = root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i]
-                        points = np.zeros(rgb.shape[0], dtype=dtype)
-                        points['x'] = pc[:, 0]
-                        points['y'] = pc[:, 1]
-                        points['z'] = pc[:, 2]
-                        ros_operator.publish_lidar_point_cloud(j, points)
+                            if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
+                                pc = np.load(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))
+                            else:
+                                pc = root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i]
+                            points = np.zeros(rgb.shape[0], dtype=dtype)
+                            points['x'] = pc[:, 0]
+                            points['y'] = pc[:, 1]
+                            points['z'] = pc[:, 2]
+                            ros_operator.publish_lidar_point_cloud(j, points)
                 for j in range(len(args.robot_base_vel_names)):
                     ros_operator.publish_robot_base(root[f'/robotBase/vel/{args.robot_base_vel_names[j]}'][i])
                 print("frame:", i)
@@ -140,25 +142,26 @@ def process_data(args, ros_operator):
                     else:
                         ros_operator.publish_camera_depth(j, root[f'/camera/depth/{args.camera_depth_names[j]}'][i])
                 for j in range(len(args.camera_point_cloud_names)):
-                    if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                        ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
-                    else:
-                        if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                            pc = np.load(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))
+                    if f'/lidar/pointCloud/{args.camera_point_cloud_names[j]}' in root.keys():
+                        if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
+                            ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
                         else:
-                            pc = root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i]
-                        rgb = (pc[:, 3]).astype(np.uint32)*(2**16) + (pc[:, 4]).astype(np.uint32)*(2**8) + (pc[:, 5]).astype(np.uint32)
-                        dtype = [('x', np.float32), ('y', np.float32), ('z', np.float32), ('rgb', np.uint32)]
-                        points = np.zeros(rgb.shape[0], dtype=dtype)
-                        points['x'] = pc[:, 0]
-                        points['y'] = pc[:, 1]
-                        points['z'] = pc[:, 2]
-                        points['rgb'] = rgb
-                        # pc[:, 3] = rgb
-                        # rgb = rgb[:, np.newaxis]
-                        # pc = np.concatenate([pc[:, :3], rgb], axis=1).astype(np.float32)
-                        # print(pc)
-                        ros_operator.publish_camera_point_cloud(j, points)
+                            if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
+                                pc = np.load(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))
+                            else:
+                                pc = root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i]
+                            rgb = (pc[:, 3]).astype(np.uint32)*(2**16) + (pc[:, 4]).astype(np.uint32)*(2**8) + (pc[:, 5]).astype(np.uint32)
+                            dtype = [('x', np.float32), ('y', np.float32), ('z', np.float32), ('rgb', np.uint32)]
+                            points = np.zeros(rgb.shape[0], dtype=dtype)
+                            points['x'] = pc[:, 0]
+                            points['y'] = pc[:, 1]
+                            points['z'] = pc[:, 2]
+                            points['rgb'] = rgb
+                            # pc[:, 3] = rgb
+                            # rgb = rgb[:, np.newaxis]
+                            # pc = np.concatenate([pc[:, :3], rgb], axis=1).astype(np.float32)
+                            # print(pc)
+                            ros_operator.publish_camera_point_cloud(j, points)
                 for j in range(len(args.arm_joint_state_names)):
                     ros_operator.publish_arm_joint_state(j, root[f'/arm/jointStatePosition/{args.arm_joint_state_names[j]}'][i])
                 for j in range(len(args.arm_end_pose_names)):
@@ -170,18 +173,19 @@ def process_data(args, ros_operator):
                 for j in range(len(args.imu_9axis_names)):
                     ros_operator.publish_imu_9axis(j, root[f'/imu/9axisOrientation/{args.imu_9axis_names[j]}'][i], root[f'/imu/9axisAngularVelocity/{args.imu_9axis_names[j]}'][i], root[f'/imu/9axisLinearAcceleration/{args.imu_9axis_names[j]}'][i])
                 for j in range(len(args.lidar_point_cloud_names)):
-                    if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                        ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
-                    else:
-                        if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                            pc = np.load(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))
+                    if f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}' in root.keys():
+                        if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
+                            ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
                         else:
-                            pc = root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i]
-                        points = np.zeros(rgb.shape[0], dtype=dtype)
-                        points['x'] = pc[:, 0]
-                        points['y'] = pc[:, 1]
-                        points['z'] = pc[:, 2]
-                        ros_operator.publish_lidar_point_cloud(j, points)
+                            if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
+                                pc = np.load(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))
+                            else:
+                                pc = root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i]
+                            points = np.zeros(rgb.shape[0], dtype=dtype)
+                            points['x'] = pc[:, 0]
+                            points['y'] = pc[:, 1]
+                            points['z'] = pc[:, 2]
+                            ros_operator.publish_lidar_point_cloud(j, points)
                 for j in range(len(args.robot_base_vel_names)):
                     ros_operator.publish_robot_base(root[f'/robotBase/vel/{args.robot_base_vel_names[j]}'][i])
                 print("frame:", i)
@@ -213,7 +217,7 @@ class RosOperator:
         self.arm_joint_state_publishers = [rospy.Publisher(topic, JointState, queue_size=10) for topic in self.args.arm_joint_state_topics]
         self.arm_end_pose_publishers = [rospy.Publisher(topic, PoseStamped, queue_size=10) for topic in self.args.arm_end_pose_topics]
         self.localization_pose_publishers = [rospy.Publisher(topic, PoseStamped, queue_size=10) for topic in self.args.localization_pose_topics]
-        # self.gripper_encoder_publishers = [rospy.Publisher(topic, Gripper, queue_size=10) for topic in self.args.gripper_encoder_topics]
+        self.gripper_encoder_publishers = [rospy.Publisher(topic, Gripper, queue_size=10) for topic in self.args.gripper_encoder_topics]
         self.imu_9axis_publishers = [rospy.Publisher(topic, Imu, queue_size=10) for topic in self.args.imu_9axis_topics]
         self.lidar_point_cloud_publishers = [rospy.Publisher(topic, PointCloud2, queue_size=10) for topic in self.args.lidar_point_cloud_topics]
         self.robot_base_publishers = [rospy.Publisher(topic, Twist, queue_size=10) for topic in self.args.robot_base_vel_topics]
@@ -270,14 +274,13 @@ class RosOperator:
         self.localization_pose_publishers[index].publish(pose_msg)
 
     def publish_gripper_encoder(self, index, encoder_angle, encoder_distance):
-        return
-        # gripper_msg = Gripper()
-        # gripper_msg.header = Header()
-        # gripper_msg.header.frame_id = "map"
-        # gripper_msg.header.stamp = rospy.Time.now()
-        # gripper_msg.angle = encoder_angle
-        # gripper_msg.distance = encoder_distance
-        # self.gripper_encoder_publishers[index].publish(gripper_msg)
+        gripper_msg = Gripper()
+        gripper_msg.header = Header()
+        gripper_msg.header.frame_id = "map"
+        gripper_msg.header.stamp = rospy.Time.now()
+        gripper_msg.angle = encoder_angle
+        gripper_msg.distance = encoder_distance
+        self.gripper_encoder_publishers[index].publish(gripper_msg)
 
     def publish_imu_9axis(self, index, orientation, angular_velocity, linear_acceleration):
         imu_msg = Imu()
@@ -329,7 +332,7 @@ def get_arguments():
                         default=['pikaDepthCamera_l', 'pikaDepthCamera_r'],
                         required=False)
     parser.add_argument('--camera_depth_topics', action='store', type=str, help='camera_depth_topics',
-                        default=['/camera_l/depth/image_rect_raw', '/camera_r/depth/image_rect_raw'],
+                        default=['/camera_l/aligned_depth_to_color/image_raw', '/camera_r/aligned_depth_to_color/image_raw'],
                         required=False)
     parser.add_argument('--camera_point_cloud_names', action='store', type=str, help='camera_point_cloud_names',
                         default=['pikaDepthCamera_l', 'pikaDepthCamera_r'],
@@ -353,7 +356,7 @@ def get_arguments():
                         default=['pika_l', 'pika_r'],
                         required=False)
     parser.add_argument('--localization_pose_topics', action='store', type=str, help='localization_pose_topics',
-                        default=['/left_pika_pose', '/right_pika_pose'],
+                        default=['/pika_pose_l', '/pika_pose_r'],
                         required=False)
     parser.add_argument('--gripper_encoder_names', action='store', type=str, help='gripper_encoder_names',
                         default=['pika_l', 'pika_r'],

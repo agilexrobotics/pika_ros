@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 #udevadm info /dev/video22
 
