@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd ~/pika_ros/install/lib &&
+cd $HOME/pika_ros/install/lib &&
 ./survive-cli --force-calibrate
