@@ -661,6 +661,14 @@ rostopic echo /gripper_r/joint_states  # double gripper, right
 
 ## 5. 遥操作
 
+>注意：
+>
+>- 本仓库遥操的 Piper 机械臂的末端夹爪是默认夹爪，如下图所示。
+>- 遥操的Xarm机械臂型号是lite6，如需要适配到其他款的xarm或者其他厂商的机械臂需要根据情况修改机械臂的控制接口以及坐标系转换。
+>- 开启和关闭的操作是通过串口通信方式传输 trigger 信号，务必要连接线且不能跳过触发trigger这一阶段，否则机械臂会出现失控的情况。
+
+![piper_arm](img/piper_arm.png)
+
 ### 5.1 准备
 
 1、克隆代码下本地并将其放置到 pika_ros/src 下
@@ -682,16 +690,30 @@ catkin_make install -DCATKIN_WHITELIST_PACKAGES=""
 3、安装环境依赖
 
 ```bash
-conda create -n pika python=3.8
+conda create -n pika python=3.8.18
 
 conda activate pika
 
-conda install pinocchio -c conda-forge
+conda install pinocchio casadi -c conda-forge
 
-pip install meshcat casadi rospkg pyyaml
+pip install meshcat rospkg pyyaml
 ```
 
 我们仅在 Ubuntu 20.04 上测试了我们的代码，其他操作系统可能需要不同的配置。
+
+在运行程序时如遇到：
+
+```bash
+ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29' not found (required by /home/agilex/miniconda3/envs/pika/lib/python3.8/site-packages/pinocchio/pinocchio_pywrap_default.cpython-38-x86_64-linux-gnu.so)
+```
+
+则在终端输入：
+
+```bash
+export LD_PRELOAD=/home/agilex/miniconda3/envs/pika/lib/libstdc++.so.6 
+```
+
+再次执行代码即可。
 
 ### 5.2 开始
 
@@ -718,6 +740,8 @@ source ~/pika_ros/install/setup.bash
 
 roslaunch remote_operation teleop_single_piper.launch
 ```
+
+4、开启程序后，Piper机械臂会去到设定的位姿，如想开启遥操作，则需要将夹爪快速往中心开合关闭两下触发trigger。关闭遥操同理。
 
 #### 5.2.2 双臂遥操Piper
 
@@ -762,15 +786,17 @@ cd ~/pika_ros/src/piper_ros
 bash can_config.sh 
 ```
 
-2、对pika进行校准，详细步骤可参考 <<Pika 产品用户手册>> 的 【2.1 基站部署】和【2.5 定位基站校准】
+2、对pika进行校准，详细步骤可参考 <<Pika 产品用户手册>> 的 【2.1 基站部署】、【2.5 定位基站校准】、【2.6 设置左右手摄像头】、【2.7 设置左右手定位器】，在【2.6 设置左右手摄像头】这步中主要设置的是左右夹持器端口号，左右鱼眼相机端口号不用设置。
 
-3、开启遥操单Piper程序
+3、开启遥操双Piper程序
 
 ```bash
 source ~/pika_ros/install/setup.bash
 
 roslaunch remote_operation teleop_double_piper.launch
 ```
+
+4、开启程序后，Piper机械臂会去到设定的位姿，如想开启遥操作，则需要将夹爪快速往中心开合关闭两下触发trigger。关闭遥操同理。
 
 #### 5.2.3 遥操单臂Xarm lite6
 
@@ -797,6 +823,8 @@ http://192.168.1.163:18333/?lang=cn&channel=prod
 ```bash
 roslaunch remote_operation teleop_single_xarm.launch
 ```
+
+4、开启程序后，lite6机械臂会去到设定的位姿，如想开启遥操作，则需要将夹爪快速往中心开合关闭两下触发trigger。关闭遥操同理。
 
 ### 5.3 配置文件说明
 
