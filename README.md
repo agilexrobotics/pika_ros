@@ -689,7 +689,7 @@ conda create -n pika python=3.8.18
 
 conda activate pika
 
-conda install pinocchio casadi -c conda-forge
+conda install pinocchio==3.2.0 casadi -c conda-forge
 
 pip install meshcat rospkg pyyaml
 ```
