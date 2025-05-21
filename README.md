@@ -427,7 +427,6 @@ topic: frame in 1 second / total frame
 /camera/depth/color/points: 0 / 165 
 /vive_pose: 0 / 0 
 /gripper/data: 0 / 367 
-/imu/data: 0 / 367 
 sum total frame: 1229 
 ```
 
@@ -457,7 +456,6 @@ done
 | /home/agilex/data/episode0/camera/pointCloud/pikaDepthCamera |     .pcd     |              pikaDepthCamera摄像头点云数据路径               |
 |   /home/agilex/data/episode0/localization/pose/pikaLocator   |    .json     |       定位器定位数据（位姿x、y、z、roll、pitch、yaw）        |
 |       /home/agilex/data/episode0/gripper/encoder/pika        |    .json     |       夹爪开合数据（电机角度angle、夹爪距离distance）        |
-|          /home/agilex/data/episode0/imu/9axis/pika           |    .json     | Imu9轴信息（角速度angular_velocity.x\y\z线加速度linear_acceleration.x\y\z        旋转四元数orientation.x\y\z\w） |
 
 以pikaDepthCamera的RGB数据为例子，以时间戳作为文件名称，其结构如下：
 
@@ -540,9 +538,6 @@ data.hdf5文件包含同步的图像路径索引、位姿数据等。
 |   localization/pose/pikaLocator   |  Float   |  (n,6)   | 定位器定位数据x\y\z\roll\pitch\yaw  |
 |     gripper/encoderAngle/pika     |  Float   |   (n,)   |        夹爪开合距离distance         |
 |   gripper/encoderDistance/pika    |  Float   |   (n,)   |        夹爪开合电机角度angle        |
-|   imu/9axisAngularVelocity/pika   |  Float   |  (n,3)   | Imu9轴角速度angular_velocity.x\y\z  |
-|     imu/9axisOrientation/pika     |  Float   |  (n,4)   | Imu9轴旋转四元数orientation.x\y\z\w |
-| imu/9axisLinearAcceleration/pika  |  Float   |  (n,3)   |         Imu9轴线加速度x\y\z         |
 |               size                |   Int    |   (n,)   |           数据的采集步长            |
 
 ### 3.3 数据重播
