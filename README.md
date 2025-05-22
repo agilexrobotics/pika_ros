@@ -685,13 +685,13 @@ catkin_make install -DCATKIN_WHITELIST_PACKAGES=""
 3、安装环境依赖
 
 ```bash
-conda create -n pika python=3.8.18
+conda create -n pika python=3.9.18
 
 conda activate pika
 
-conda install pinocchio==3.2.0 casadi -c conda-forge
+conda install pinocchio==3.2.0 casadi==3.6.7 -c conda-forge
 
-pip install meshcat rospkg pyyaml
+pip3 install meshcat rospkg pyyaml piper-sdk opencv-python 
 ```
 
 我们仅在 Ubuntu 20.04 上测试了我们的代码，其他操作系统可能需要不同的配置。
@@ -857,4 +857,3 @@ pika_pose 话题的坐标系如上图所示：x轴超前、y轴朝左、z轴朝�
 /pika_pose 话题的数据类型为 geometry_msgs::PoseStamped，市场主流机械臂一般都会开放机械臂末端控制接口，其消息类型也是 geometry_msgs::PoseStamped
 
 代码可以参考：teleop_xarm.py
-
