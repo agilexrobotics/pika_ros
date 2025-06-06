@@ -17,6 +17,7 @@ import cv2
 import json
 import numpy as np
 import cv2
+import yaml
 
 
 def create_transformation_matrix(x, y, z, roll, pitch, yaw):
@@ -380,6 +381,8 @@ def get_arguments():
                         default="/home/agilex/data", required=False)
     parser.add_argument('--episodeIndex', action='store', type=int, help='episodeIndex',
                         default=-1, required=False)
+    parser.add_argument('--type', action='store', type=str, help='type',
+                        default="aloha", required=False)
     parser.add_argument('--pointNum', action='store', type=int, help='point_num',
                         default=5000, required=False)
     parser.add_argument('--voxelSize', action='store', type=float, help='voxelSize',
@@ -389,8 +392,13 @@ def get_arguments():
     parser.add_argument('--use_augment', action='store', type=bool, help='use_augment',
                         default=False, required=False)
     parser.add_argument('--cameraNames', action='store', type=str, help='cameraNames',
-                        default=['pikaDepthCamera'], required=False)
+                        default=[], required=False)
     args = parser.parse_args()
+
+    with open(f'../install/share/data_tools/config/{args.type}_data_params.yaml', 'r') as file:
+        yaml_data = yaml.safe_load(file)
+        args.cameraNames = yaml_data['dataInfo']['camera']['depth']['names']
+
     return args
 
 

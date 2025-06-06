@@ -12,6 +12,7 @@ import argparse
 import json
 import cv2
 from scipy.spatial.transform import Rotation as R
+import yaml
 
 
 def matrix_to_xyzrpy(matrix):
@@ -67,6 +68,7 @@ class Operator:
         self.imu9AxisDirs = [os.path.join(self.episodeDir, "imu/9axis/" + self.args.imu9AxisNames[i]) for i in range(len(self.args.imu9AxisNames))]
         self.lidarPointCloudDirs = [os.path.join(self.episodeDir, "lidar/pointCloud/" + self.args.lidarPointCloudNames[i]) for i in range(len(self.args.lidarPointCloudNames))]
         self.robotBaseVelDirs = [os.path.join(self.episodeDir, "robotBase/vel/" + self.args.robotBaseVelNames[i]) for i in range(len(self.args.robotBaseVelNames))]
+        self.liftMotorDirs = [os.path.join(self.episodeDir, "lift/motor/" + self.args.liftMotorNames[i]) for i in range(len(self.args.liftMotorNames))]
         
         self.cameraColorSyncDirs = [os.path.join(self.cameraColorDirs[i], "sync.txt") for i in range(len(self.args.cameraColorNames))]
         self.cameraDepthSyncDirs = [os.path.join(self.cameraDepthDirs[i], "sync.txt") for i in range(len(self.args.cameraDepthNames))]
@@ -78,13 +80,17 @@ class Operator:
         self.imu9AxisSyncDirs = [os.path.join(self.imu9AxisDirs[i], "sync.txt") for i in range(len(self.args.imu9AxisNames))]
         self.lidarPointCloudSyncDirs = [os.path.join(self.lidarPointCloudDirs[i], "sync.txt") for i in range(len(self.args.lidarPointCloudNames))]
         self.robotBaseVelSyncDirs = [os.path.join(self.robotBaseVelDirs[i], "sync.txt") for i in range(len(self.args.robotBaseVelNames))]
+        self.liftMotorSyncDirs = [os.path.join(self.liftMotorDirs[i], "sync.txt") for i in range(len(self.args.liftMotorNames))]
 
         self.cameraColorConfigDirs = [os.path.join(self.cameraColorDirs[i], "config.json") for i in range(len(self.args.cameraColorNames))]
         self.cameraDepthConfigDirs = [os.path.join(self.cameraDepthDirs[i], "config.json") for i in range(len(self.args.cameraDepthNames))]
         self.cameraPointCloudConfigDirs = [os.path.join(self.cameraPointCloudDirs[i], "config.json") for i in range(len(self.args.cameraPointCloudNames))]
 
-        self.instructionsDir = os.path.join(self.args.datasetDir, "instructions.npy")
-        self.dataFile = os.path.join(self.episodeDir, "data.hdf5")
+        self.instructionsDir = os.path.join(self.episodeDir, "instructions.npy")
+        if self.args.useIndex:
+            self.dataFile = os.path.join(self.episodeDir, "data.hdf5")
+        else:
+            self.dataFile = os.path.join(self.args.datasetTargetDir, f"episode{self.args.episodeIndex}.hdf5")
 
     def process(self):
         data_dict = {}
@@ -119,7 +125,10 @@ class Operator:
             data_dict[f'lidar/pointCloud/{lidarPointCloudName}'] = []
         for robotBaseVelName in self.args.robotBaseVelNames:
             data_dict[f'robotBase/vel/{robotBaseVelName}'] = []
+        for liftMotorName in self.args.liftMotorNames:
+            data_dict[f'lift/motor/{liftMotorName}'] = []
         data_dict[f'instruction'] = self.instructionsDir
+        data_dict[f'timestamp'] = []
         data_dict[f'size'] = 0
         size_count = 0
         for i in range(len(self.args.cameraColorNames)):
@@ -127,7 +136,15 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
-                    data_dict[f'camera/color/{self.args.cameraColorNames[i]}'].append(os.path.join(self.cameraColorDirs[i], line))
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
+                    if self.args.useIndex:
+                        data_dict[f'camera/color/{self.args.cameraColorNames[i]}'].append(os.path.join(self.cameraColorDirs[i][len(self.episodeDir)+1:], line))
+                    else:
+                        data_dict[f'camera/color/{self.args.cameraColorNames[i]}'].append(cv2.imread(os.path.join(self.cameraColorDirs[i], line)))
                     # print(os.path.join(self.cameraColorDirs[i], line))
                     # cv2.imread(os.path.join(self.cameraColorDirs[i], line))
                     count += 1
@@ -144,7 +161,15 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
-                    data_dict[f'camera/depth/{self.args.cameraDepthNames[i]}'].append(os.path.join(self.cameraDepthDirs[i], line))
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
+                    if self.args.useIndex:
+                        data_dict[f'camera/depth/{self.args.cameraDepthNames[i]}'].append(os.path.join(self.cameraDepthDirs[i][len(self.episodeDir)+1:], line))
+                    else:
+                        data_dict[f'camera/depth/{self.args.cameraDepthNames[i]}'].append(cv2.imread(os.path.join(self.cameraDepthDirs[i], line)))
                     # print(os.path.join(self.cameraDepthDirs[i], line))
                     # img = cv2.imread(os.path.join(self.cameraDepthDirs[i], line), cv2.IMREAD_UNCHANGED).flatten()
                     # print(max(img), min(img))
@@ -162,7 +187,15 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
-                    data_dict[f'camera/pointCloud/{self.args.cameraPointCloudNames[i]}'].append(os.path.join(self.cameraPointCloudDirs[i], line))
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
+                    if self.args.useIndex:
+                        data_dict[f'camera/pointCloud/{self.args.cameraPointCloudNames[i]}'].append(os.path.join(self.cameraPointCloudDirs[i][len(self.episodeDir)+1:], line))
+                    else:
+                        data_dict[f'camera/pointCloud/{self.args.cameraPointCloudNames[i]}'].append(np.load(os.path.join(self.cameraPointCloudDirs[i], line)))
                     count += 1
                 if size_count == 0:
                     size_count = count
@@ -177,6 +210,11 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
                     with open(os.path.join(self.armJointStateDirs[i], line), 'r') as file:
                         data = json.load(file)
                         data_dict[f'arm/jointStateVelocity/{self.args.armJointStateNames[i]}'].append(np.array(data['velocity']))
@@ -190,9 +228,17 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
                     with open(os.path.join(self.armEndPoseDirs[i], line), 'r') as file:
                         data = json.load(file)
-                        data_dict[f'arm/endPose/{self.args.armEndPoseNames[i]}'].append(np.array([data['x'], data['y'], data['z'], data['roll'], data['pitch'], data['yaw'], data['grasper']]))
+                        if 'grasper' in data.keys():
+                            data_dict[f'arm/endPose/{self.args.armEndPoseNames[i]}'].append(np.array([data['x'], data['y'], data['z'], data['roll'], data['pitch'], data['yaw'], data['grasper']]))
+                        else:
+                            data_dict[f'arm/endPose/{self.args.armEndPoseNames[i]}'].append(np.array([data['x'], data['y'], data['z'], data['roll'], data['pitch'], data['yaw']]))
                     count += 1
                 if size_count == 0:
                     size_count = count
@@ -201,6 +247,11 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
                     with open(os.path.join(self.localizationPoseDirs[i], line), 'r') as file:
                         data = json.load(file)
                         # ori_trans = create_transformation_matrix(data['x'], data['y'], data['z'], data['roll'], data['pitch'], data['yaw'])
@@ -216,6 +267,11 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
                     with open(os.path.join(self.gripperEncoderDirs[i], line), 'r') as file:
                         data = json.load(file)
                         data_dict[f'gripper/encoderAngle/{self.args.gripperEncoderNames[i]}'].append(data['angle'])
@@ -228,6 +284,11 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
                     with open(os.path.join(self.imu9AxisDirs[i], line), 'r') as file:
                         data = json.load(file)
                         data_dict[f'imu/9axisOrientation/{self.args.imu9AxisNames[i]}'].append(np.array([data['orientation']['x'], data['orientation']['y'], data['orientation']['z'], data['orientation']['w']]))
@@ -241,7 +302,12 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
-                    data_dict[f'lidar/pointCloud/{self.args.lidarPointCloudNames[i]}'].append(os.path.join(self.lidarPointCloudDirs[i], line))
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
+                    data_dict[f'lidar/pointCloud/{self.args.lidarPointCloudNames[i]}'].append(os.path.join(self.lidarPointCloudDirs[i][len(self.episodeDir)+1:], line))
                     count += 1
                 if size_count == 0:
                     size_count = count
@@ -250,9 +316,30 @@ class Operator:
                 count = 0
                 for line in lines:
                     line = line.replace('\n', '')
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
                     with open(os.path.join(self.robotBaseVelDirs[i], line), 'r') as file:
                         data = json.load(file)
-                        data_dict[f'arm/robotBaseVel/{self.args.robotBaseVelNames[i]}'].append(np.array([data['linear']['x'], data['linear']['y'], data['angular']['z']]))
+                        data_dict[f'robotBase/vel/{self.args.robotBaseVelNames[i]}'].append(np.array([data['linear']['x'], data['linear']['y'], data['angular']['z']]))
+                    count += 1
+                if size_count == 0:
+                    size_count = count
+        for i in range(len(self.args.liftMotorNames)):
+            with open(self.liftMotorSyncDirs[i], 'r') as lines:
+                count = 0
+                for line in lines:
+                    line = line.replace('\n', '')
+                    time = float(line[:line.rfind(".")])
+                    if len(data_dict[f'timestamp']) <= count:
+                        data_dict[f'timestamp'].append(time)
+                    else:
+                        data_dict[f'timestamp'][count] = time if time < data_dict[f'timestamp'][count] else data_dict[f'timestamp'][count]
+                    with open(os.path.join(self.liftMotorDirs[i], line), 'r') as file:
+                        data = json.load(file)
+                        data_dict[f'lift/motor/{self.args.liftMotorNames[i]}'].append(data['backHeight'])
                     count += 1
                 if size_count == 0:
                     size_count = count
@@ -268,14 +355,20 @@ def get_arguments():
                         default="/home/agilex/data", required=False)
     parser.add_argument('--episodeIndex', action='store', type=int, help='episodeIndex',
                         default=-1, required=False)
-    parser.add_argument('--cameraColorNames', action='store', type=str, help='cameraColorNames',
-                        default=['pikaDepthCamera', 'pikaFisheyeCamera'], required=False)
-    parser.add_argument('--cameraDepthNames', action='store', type=str, help='cameraDepthNames',
-                        default=['pikaDepthCamera'], required=False)
-    parser.add_argument('--cameraPointCloudNames', action='store', type=str, help='cameraPointCloudNames',
-                        default=['pikaDepthCamera'], required=False)
-    parser.add_argument('--useCameraPointCloud', action='store', type=bool, help='useCameraPointCloud',
+    parser.add_argument('--datasetTargetDir', action='store', type=str, help='datasetTargetDir',
+                        default="/home/agilex/data", required=False)
+    parser.add_argument('--useIndex', action='store', type=bool, help='useIndex',
                         default=True, required=False)
+    parser.add_argument('--type', action='store', type=str, help='type',
+                        default="aloha", required=False)
+    parser.add_argument('--cameraColorNames', action='store', type=str, help='cameraColorNames',
+                        default=[], required=False)
+    parser.add_argument('--cameraDepthNames', action='store', type=str, help='cameraDepthNames',
+                        default=[], required=False)
+    parser.add_argument('--cameraPointCloudNames', action='store', type=str, help='cameraPointCloudNames',
+                        default=[], required=False)
+    parser.add_argument('--useCameraPointCloud', action='store', type=bool, help='useCameraPointCloud',
+                        default=False, required=False)
     parser.add_argument('--useCameraPointCloudNormalization', action='store', type=bool, help='useCameraPointCloudNormalization',
                         default=True, required=False)
     parser.add_argument('--armJointStateNames', action='store', type=str, help='armJointStateNames',
@@ -283,16 +376,33 @@ def get_arguments():
     parser.add_argument('--armEndPoseNames', action='store', type=str, help='armEndPoseNames',
                         default=[], required=False)
     parser.add_argument('--localizationPoseNames', action='store', type=str, help='localizationPoseNames',
-                        default=['pika'], required=False)
+                        default=[], required=False)
     parser.add_argument('--gripperEncoderNames', action='store', type=str, help='gripperEncoderNames',
-                        default=['pika'], required=False)
+                        default=[], required=False)
     parser.add_argument('--imu9AxisNames', action='store', type=str, help='imu9AxisNames',
-                        default=['pika'], required=False)
+                        default=[], required=False)
     parser.add_argument('--lidarPointCloudNames', action='store', type=str, help='lidarPointCloudNames',
                         default=[], required=False)
     parser.add_argument('--robotBaseVelNames', action='store', type=str, help='robotBaseVelNames',
                         default=[], required=False)
+    parser.add_argument('--liftMotorNames', action='store', type=str, help='liftMotorNames',
+                        default=[], required=False)
     args = parser.parse_args()
+
+    with open(f'../install/share/data_tools/config/{args.type}_data_params.yaml', 'r') as file:
+        yaml_data = yaml.safe_load(file)
+        args.cameraColorNames = yaml_data['dataInfo']['camera']['color']['names']
+        args.cameraDepthNames = yaml_data['dataInfo']['camera']['depth']['names']
+        args.cameraPointCloudNames = yaml_data['dataInfo']['camera']['pointCloud']['names']
+        args.armJointStateNames = yaml_data['dataInfo']['arm']['jointState']['names']
+        args.armEndPoseNames = yaml_data['dataInfo']['arm']['endPose']['names']
+        args.localizationPoseNames = yaml_data['dataInfo']['localization']['pose']['names']
+        args.gripperEncoderNames = yaml_data['dataInfo']['gripper']['encoder']['names']
+        args.imu9AxisNames = yaml_data['dataInfo']['imu']['9axis']['names']
+        args.lidarPointCloudNames = yaml_data['dataInfo']['lidar']['pointCloud']['names']
+        args.robotBaseVelNames = yaml_data['dataInfo']['robotBase']['vel']['names']
+        args.liftMotorNames = yaml_data['dataInfo']['lift']['motor']['names']
+
     return args
 
 

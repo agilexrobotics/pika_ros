@@ -31,6 +31,11 @@ from cv_bridge import CvBridge, CvBridgeError
 from tf.transformations import quaternion_from_euler
 import pcl
 import ros_numpy
+import yaml
+USELIFT = False
+if USELIFT:
+    from bt_task_msgs.msg import LiftMotorMsg
+    from bt_task_msgs.srv import LiftMotorSrv, LiftMotorSrvRequest, LiftMotorSrvResponse
 
 
 def pcd_to_msg(points):
@@ -62,6 +67,8 @@ def process_data(args, ros_operator):
 
     episode_dir = os.path.join(args.datasetDir, "episode" + str(args.episodeIndex))
     data_path = os.path.join(episode_dir, 'data.hdf5')
+    if not os.path.exists(data_path):
+        data_path = os.path.join(args.datasetDir, "episode" + str(args.episodeIndex) + '.hdf5')
     rate = rospy.Rate(args.publish_rate)
     with h5py.File(data_path, 'r') as root:
         max_action_len = root['size'][()]
@@ -70,21 +77,21 @@ def process_data(args, ros_operator):
                 i = args.publishIndex
                 for j in range(len(args.camera_color_names)):
                     if root[f'/camera/color/{args.camera_color_names[j]}'].ndim == 1:
-                        ros_operator.publish_camera_color(j, cv2.imread(root[f'/camera/color/{args.camera_color_names[j]}'][i].decode('utf-8'), cv2.IMREAD_UNCHANGED))
+                        ros_operator.publish_camera_color(j, cv2.imread(os.path.join(episode_dir, root[f'/camera/color/{args.camera_color_names[j]}'][i].decode('utf-8')), cv2.IMREAD_UNCHANGED))
                     else:
                         ros_operator.publish_camera_color(j, root[f'/camera/color/{args.camera_color_names[j]}'][i])
                 for j in range(len(args.camera_depth_names)):
                     if root[f'/camera/depth/{args.camera_depth_names[j]}'].ndim == 1:
-                        ros_operator.publish_camera_depth(j, cv2.imread(root[f'/camera/depth/{args.camera_depth_names[j]}'][i].decode('utf-8'), cv2.IMREAD_UNCHANGED))
+                        ros_operator.publish_camera_depth(j, cv2.imread(os.path.join(episode_dir, root[f'/camera/depth/{args.camera_depth_names[j]}'][i].decode('utf-8')), cv2.IMREAD_UNCHANGED))
                     else:
                         ros_operator.publish_camera_depth(j, root[f'/camera/depth/{args.camera_depth_names[j]}'][i])
                 for j in range(len(args.camera_point_cloud_names)):
                     if f'/lidar/pointCloud/{args.camera_point_cloud_names[j]}' in root.keys():
                         if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                            ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
+                            ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(os.path.join(episode_dir, root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))).to_array())
                         else:
                             if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                                pc = np.load(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))
+                                pc = np.load(os.path.join(episode_dir, root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')))
                             else:
                                 pc = root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i]
                             rgb = (pc[:, 3]).astype(np.uint32)*(2**16) + (pc[:, 4]).astype(np.uint32)*(2**8) + (pc[:, 5]).astype(np.uint32)
@@ -112,10 +119,10 @@ def process_data(args, ros_operator):
                 for j in range(len(args.lidar_point_cloud_names)):
                     if f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}' in root.keys():
                         if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                            ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
+                            ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(os.path.join(episode_dir, root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))).to_array())
                         else:
                             if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                                pc = np.load(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))
+                                pc = np.load(os.path.join(episode_dir, root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')))
                             else:
                                 pc = root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i]
                             points = np.zeros(rgb.shape[0], dtype=dtype)
@@ -124,7 +131,9 @@ def process_data(args, ros_operator):
                             points['z'] = pc[:, 2]
                             ros_operator.publish_lidar_point_cloud(j, points)
                 for j in range(len(args.robot_base_vel_names)):
-                    ros_operator.publish_robot_base(root[f'/robotBase/vel/{args.robot_base_vel_names[j]}'][i])
+                    ros_operator.publish_robot_base_vel(j, root[f'/robotBase/vel/{args.robot_base_vel_names[j]}'][i])
+                for j in range(len(args.lift_motor_names)):
+                    ros_operator.publish_lift_motor(j, root[f'/lift/motor/{args.lift_motor_names[j]}'][i])
                 print("frame:", i)
                 rate.sleep()
         else:
@@ -133,21 +142,21 @@ def process_data(args, ros_operator):
                     return
                 for j in range(len(args.camera_color_names)):
                     if root[f'/camera/color/{args.camera_color_names[j]}'].ndim == 1:
-                        ros_operator.publish_camera_color(j, cv2.imread(root[f'/camera/color/{args.camera_color_names[j]}'][i].decode('utf-8'), cv2.IMREAD_UNCHANGED))
+                        ros_operator.publish_camera_color(j, cv2.imread(os.path.join(episode_dir, root[f'/camera/color/{args.camera_color_names[j]}'][i].decode('utf-8')), cv2.IMREAD_UNCHANGED))
                     else:
                         ros_operator.publish_camera_color(j, root[f'/camera/color/{args.camera_color_names[j]}'][i])
                 for j in range(len(args.camera_depth_names)):
                     if root[f'/camera/depth/{args.camera_depth_names[j]}'].ndim == 1:
-                        ros_operator.publish_camera_depth(j, cv2.imread(root[f'/camera/depth/{args.camera_depth_names[j]}'][i].decode('utf-8'), cv2.IMREAD_UNCHANGED))
+                        ros_operator.publish_camera_depth(j, cv2.imread(os.path.join(episode_dir, root[f'/camera/depth/{args.camera_depth_names[j]}'][i].decode('utf-8')), cv2.IMREAD_UNCHANGED))
                     else:
                         ros_operator.publish_camera_depth(j, root[f'/camera/depth/{args.camera_depth_names[j]}'][i])
                 for j in range(len(args.camera_point_cloud_names)):
                     if f'/lidar/pointCloud/{args.camera_point_cloud_names[j]}' in root.keys():
                         if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                            ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
+                            ros_operator.publish_camera_point_cloud(j, pcl.load_XYZRGB(os.path.join(episode_dir, root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))).to_array())
                         else:
                             if root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'].ndim == 1 and root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                                pc = np.load(root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8'))
+                                pc = np.load(os.path.join(episode_dir, root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i].decode('utf-8')))
                             else:
                                 pc = root[f'/camera/pointCloud/{args.camera_point_cloud_names[j]}'][i]
                             rgb = (pc[:, 3]).astype(np.uint32)*(2**16) + (pc[:, 4]).astype(np.uint32)*(2**8) + (pc[:, 5]).astype(np.uint32)
@@ -175,10 +184,10 @@ def process_data(args, ros_operator):
                 for j in range(len(args.lidar_point_cloud_names)):
                     if f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}' in root.keys():
                         if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'pcd':
-                            ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')).to_array())
+                            ros_operator.publish_lidar_point_cloud(j, pcl.load_XYZI(os.path.join(episode_dir, root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))).to_array())
                         else:
                             if root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'].ndim == 1 and root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')[-3:] == 'npy':
-                                pc = np.load(root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8'))
+                                pc = np.load(os.path.join(episode_dir, root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i].decode('utf-8')))
                             else:
                                 pc = root[f'/lidar/pointCloud/{args.lidar_point_cloud_names[j]}'][i]
                             points = np.zeros(rgb.shape[0], dtype=dtype)
@@ -187,7 +196,9 @@ def process_data(args, ros_operator):
                             points['z'] = pc[:, 2]
                             ros_operator.publish_lidar_point_cloud(j, points)
                 for j in range(len(args.robot_base_vel_names)):
-                    ros_operator.publish_robot_base(root[f'/robotBase/vel/{args.robot_base_vel_names[j]}'][i])
+                    ros_operator.publish_robot_base_vel(j, root[f'/robotBase/vel/{args.robot_base_vel_names[j]}'][i])
+                for j in range(len(args.lift_motor_names)):
+                    ros_operator.publish_lift_motor(j, root[f'/lift/motor/{args.lift_motor_names[j]}'][i])
                 print("frame:", i)
                 rate.sleep()
 
@@ -205,7 +216,8 @@ class RosOperator:
         self.gripper_encoder_publishers = []
         self.imu_9axis_publishers = []
         self.lidar_point_cloud_publishers = []
-        self.robot_base_publishers = []
+        self.robot_base_vel_publishers = []
+        self.lift_motor_publishers = []
         self.init_ros()
 
     def init_ros(self):
@@ -220,16 +232,27 @@ class RosOperator:
         self.gripper_encoder_publishers = [rospy.Publisher(topic, Gripper, queue_size=10) for topic in self.args.gripper_encoder_topics]
         self.imu_9axis_publishers = [rospy.Publisher(topic, Imu, queue_size=10) for topic in self.args.imu_9axis_topics]
         self.lidar_point_cloud_publishers = [rospy.Publisher(topic, PointCloud2, queue_size=10) for topic in self.args.lidar_point_cloud_topics]
-        self.robot_base_publishers = [rospy.Publisher(topic, Twist, queue_size=10) for topic in self.args.robot_base_vel_topics]
+        self.robot_base_vel_publishers = [rospy.Publisher(topic, Twist, queue_size=10) for topic in self.args.robot_base_vel_topics]
+        if USELIFT:
+            self.lift_motor_publishers = [rospy.Publisher(topic, LiftMotorMsg, queue_size=10) for topic in self.args.lift_motor_topics]
 
     def publish_camera_color(self, index, color):
-        self.camera_color_publishers[index].publish(self.bridge.cv2_to_imgmsg(color, "bgr8"))
+        msg = self.bridge.cv2_to_imgmsg(color, "bgr8")
+        msg.header = Header()
+        msg.header.stamp = rospy.Time.now()
+        self.camera_color_publishers[index].publish(msg)
 
     def publish_camera_depth(self, index, depth):
-        self.camera_depth_publishers[index].publish(self.bridge.cv2_to_imgmsg(depth, "16UC1"))
+        msg = self.bridge.cv2_to_imgmsg(depth, "16UC1")
+        msg.header = Header()
+        msg.header.stamp = rospy.Time.now()
+        self.camera_depth_publishers[index].publish(msg)
 
     def publish_camera_point_cloud(self, index, point_cloud):
-        self.camera_point_cloud_publishers[index].publish(pcd_to_msg(point_cloud))
+        msg = pcd_to_msg(point_cloud)
+        msg.header = Header()
+        msg.header.stamp = rospy.Time.now()
+        self.camera_point_cloud_publishers[index].publish(msg)
 
     def publish_arm_joint_state(self, index, joint_state):
         joint_state_msg = JointState()
@@ -247,15 +270,17 @@ class RosOperator:
         end_pose_msg.pose.position.x = end_pose[0]
         end_pose_msg.pose.position.y = end_pose[1]
         end_pose_msg.pose.position.z = end_pose[2]
-        end_pose_msg.pose.orientation.x = end_pose[3]
-        end_pose_msg.pose.orientation.y = end_pose[4]
-        end_pose_msg.pose.orientation.z = end_pose[5]
-        end_pose_msg.pose.orientation.w = end_pose[6]
-        # q = quaternion_from_euler(end_pose[3], end_pose[4], end_pose[5])
-        # end_pose_msg.pose.orientation.x = q[0]
-        # end_pose_msg.pose.orientation.y = q[1]
-        # end_pose_msg.pose.orientation.z = q[2]
-        # end_pose_msg.pose.orientation.w = q[3]
+        if self.args.arm_end_pose_orients[index]:
+            q = quaternion_from_euler(end_pose[3], end_pose[4], end_pose[5])
+            end_pose_msg.pose.orientation.x = q[0]
+            end_pose_msg.pose.orientation.y = q[1]
+            end_pose_msg.pose.orientation.z = q[2]
+            end_pose_msg.pose.orientation.w = q[3]
+        else:
+            end_pose_msg.pose.orientation.x = end_pose[3]
+            end_pose_msg.pose.orientation.y = end_pose[4]
+            end_pose_msg.pose.orientation.z = end_pose[5]
+            end_pose_msg.pose.orientation.w = end_pose[6]
         self.arm_end_pose_publishers[index].publish(end_pose_msg)
 
     def publish_localization_pose(self, index, pose):
@@ -302,7 +327,7 @@ class RosOperator:
     def publish_lidar_point_cloud(self, index, point_cloud):
         self.lidar_point_cloud_publishers[index].publish(pcd_to_msg(point_cloud))
 
-    def publish_robot_base(self, index, vel):
+    def publish_robot_base_vel(self, index, vel):
         vel_msg = Twist()
         vel_msg.linear.x = vel[0]
         vel_msg.linear.y = vel[1]
@@ -310,7 +335,21 @@ class RosOperator:
         vel_msg.angular.x = 0
         vel_msg.angular.y = 0
         vel_msg.angular.z = vel[2]
-        self.robot_base_publishers[index].publish(vel_msg)
+        self.robot_base_vel_publishers[index].publish(vel_msg)
+
+    def publish_lift_motor(self, index, val):
+        if USELIFT:
+            # rospy.wait_for_service(self.args.lift_motor_topics[index])
+            try:
+                lift_motor_srv = rospy.ServiceProxy(self.args.lift_motor_topics[index], LiftMotorSrv)
+                req = LiftMotorSrvRequest()
+                req.val = val
+                req.mode = 0
+                response = lift_motor_srv(req)
+                return response
+            except rospy.ServiceException as e:
+                rospy.logerr("Service call failed: %s" % e)
+                return None
 
 
 def get_arguments():
@@ -321,24 +360,26 @@ def get_arguments():
                         default=0, required=False)
     parser.add_argument('--publishIndex', action='store', type=int, help='publishIndex',
                         default=-1, required=False)
+    parser.add_argument('--type', action='store', type=str, help='type',
+                        default="aloha", required=False)
 
     parser.add_argument('--camera_color_names', action='store', type=str, help='camera_color_names',
-                        default=['pikaDepthCamera', 'pikaFisheyeCamera'],
+                        default=[],
                         required=False)
     parser.add_argument('--camera_color_topics', action='store', type=str, help='camera_color_topics',
-                        default=['/camera/color/image_raw', '/camera_fisheye/color/image_raw'],
+                        default=[],
                         required=False)
     parser.add_argument('--camera_depth_names', action='store', type=str, help='camera_depth_names',
-                        default=['pikaDepthCamera'],
+                        default=[],
                         required=False)
     parser.add_argument('--camera_depth_topics', action='store', type=str, help='camera_depth_topics',
-                        default=['/camera/aligned_depth_to_color/image_raw'],
+                        default=[],
                         required=False)
     parser.add_argument('--camera_point_cloud_names', action='store', type=str, help='camera_point_cloud_names',
-                        default=['pikaDepthCamera'],
+                        default=[],
                         required=False)
     parser.add_argument('--camera_point_cloud_topics', action='store', type=str, help='camera_point_cloud_topics',
-                        default=['/camera/depth/color/points'],
+                        default=[],
                         required=False)
     parser.add_argument('--arm_joint_state_names', action='store', type=str, help='arm_joint_state_names',
                         default=[],
@@ -352,23 +393,26 @@ def get_arguments():
     parser.add_argument('--arm_end_pose_topics', action='store', type=str, help='arm_end_pose_topics',
                         default=[],
                         required=False)
+    parser.add_argument('--arm_end_pose_orients', action='store', type=str, help='arm_end_pose_orients',
+                        default=[],
+                        required=False)
     parser.add_argument('--localization_pose_names', action='store', type=str, help='localization_pose_names',
-                        default=['pika'],
+                        default=[],
                         required=False)
     parser.add_argument('--localization_pose_topics', action='store', type=str, help='localization_pose_topics',
-                        default=['/pika_pose'],
+                        default=[],
                         required=False)
     parser.add_argument('--gripper_encoder_names', action='store', type=str, help='gripper_encoder_names',
-                        default=['pika'],
+                        default=[],
                         required=False)
     parser.add_argument('--gripper_encoder_topics', action='store', type=str, help='gripper_encoder_topics',
-                        default=['/gripper/data'],
+                        default=[],
                         required=False)
     parser.add_argument('--imu_9axis_names', action='store', type=str, help='imu_9axis_names',
-                        default=['pika'],
+                        default=[],
                         required=False)
     parser.add_argument('--imu_9axis_topics', action='store', type=str, help='imu_9axis_topics',
-                        default=['/imu/data'],
+                        default=[],
                         required=False)
     parser.add_argument('--lidar_point_cloud_names', action='store', type=str, help='lidar_point_cloud_names',
                         default=[],
@@ -382,9 +426,42 @@ def get_arguments():
     parser.add_argument('--robot_base_vel_topics', action='store', type=str, help='robot_base_vel_topics',
                         default=[],
                         required=False)
+    parser.add_argument('--lift_motor_names', action='store', type=str, help='lift_motor_names',
+                        default=[],
+                        required=False)
+    parser.add_argument('--lift_motor_topics', action='store', type=str, help='lift_motor_topics',
+                        default=[],
+                        required=False)
     parser.add_argument('--publish_rate', action='store', type=int, help='publish_rate',
                         default=30, required=False)
     args = parser.parse_args()
+
+    with open(f'../install/share/data_tools/config/{args.type}_data_params.yaml', 'r') as file:
+        yaml_data = yaml.safe_load(file)
+        args.camera_color_names = yaml_data['dataInfo']['camera']['color']['names']
+        args.camera_color_topics = yaml_data['dataInfo']['camera']['color']['topics']
+        args.camera_depth_names = yaml_data['dataInfo']['camera']['depth']['names']
+        args.camera_depth_topics = yaml_data['dataInfo']['camera']['depth']['topics']
+        args.camera_point_cloud_names = yaml_data['dataInfo']['camera']['pointCloud']['names']
+        args.camera_point_cloud_topics = yaml_data['dataInfo']['camera']['pointCloud']['topics']
+        args.arm_joint_state_names = yaml_data['dataInfo']['arm']['jointState']['names']
+        args.arm_joint_state_topics = yaml_data['dataInfo']['arm']['jointState']['topics']
+        args.arm_end_pose_names = yaml_data['dataInfo']['arm']['endPose']['names']
+        args.arm_end_pose_topics = yaml_data['dataInfo']['arm']['endPose']['topics']
+        args.arm_end_pose_orients = yaml_data['dataInfo']['arm']['endPose']['orients']
+        args.localization_pose_names = yaml_data['dataInfo']['localization']['pose']['names']
+        args.localization_pose_topics = yaml_data['dataInfo']['localization']['pose']['topics']
+        args.gripper_encoder_names = yaml_data['dataInfo']['gripper']['encoder']['names']
+        args.gripper_encoder_topics = yaml_data['dataInfo']['gripper']['encoder']['topics']
+        args.imu_9axis_names = yaml_data['dataInfo']['imu']['9axis']['names']
+        args.imu_9axis_topics = yaml_data['dataInfo']['imu']['9axis']['topics']
+        args.lidar_point_cloud_names = yaml_data['dataInfo']['lidar']['pointCloud']['names']
+        args.lidar_point_cloud_topics = yaml_data['dataInfo']['lidar']['pointCloud']['topics']
+        args.robot_base_vel_names = yaml_data['dataInfo']['robotBase']['vel']['names']
+        args.robot_base_vel_topics = yaml_data['dataInfo']['robotBase']['vel']['topics']
+        args.lift_motor_names = yaml_data['dataInfo']['lift']['motor']['names']
+        args.lift_motor_topics = yaml_data['dataInfo']['lift']['motor']['topics']
+
     return args
 
 
