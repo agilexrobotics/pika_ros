@@ -4,6 +4,7 @@ import subprocess
 import re
 import os
 import cv2
+import time
 
 def run_command(command):
     """运行命令并返回输出"""
@@ -128,6 +129,7 @@ def generate_start_bash(left_info, right_info, select):
         usb_num1 = 50
         usb_num2 = 51
         content = f"""
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 camera_fps=30
 camera_width=640
 camera_height=480
@@ -141,11 +143,11 @@ l_fisheye_port={usb_num1}
 r_fisheye_port={usb_num2}
 sudo chmod a+rw /dev/video*
 
-source /opt/ros/noetic/setup.bash && cd ~/pika_ros/install/share/sensor_tools/scripts && chmod 777 usb_camera.py
+source /opt/ros/humble/setup.bash && cd $SCRIPT_DIR/../install/sensor_tools/share/sensor_tools/scripts/ && chmod 777 usb_camera.py
 if [ -n "$1" ]; then
-    source ~/pika_ros/install/setup.bash && roslaunch sensor_tools open_multi_sensor.launch l_depth_camera_no:=$l_depth_camera_no r_depth_camera_no:=$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height name:=$1 name_index:=$1_
+    source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_multi_sensor.launch.py l_depth_camera_no:=_$l_depth_camera_no r_depth_camera_no:=_$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps name:=$1 name_index:=$1_
 else
-    source ~/pika_ros/install/setup.bash && roslaunch sensor_tools open_multi_sensor.launch l_depth_camera_no:=$l_depth_camera_no r_depth_camera_no:=$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height
+    source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_multi_sensor.launch.py l_depth_camera_no:=_$l_depth_camera_no r_depth_camera_no:=_$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
 fi
                 """
     if select == "2":
@@ -153,6 +155,7 @@ fi
         usb_num1 = 60
         usb_num2 = 61
         content = f"""
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 camera_fps=30
 camera_width=640
 camera_height=480
@@ -166,11 +169,11 @@ l_fisheye_port={usb_num1}
 r_fisheye_port={usb_num2}
 sudo chmod a+rw /dev/video*
 
-source /opt/ros/noetic/setup.bash && cd ~/pika_ros/install/share/sensor_tools/scripts && chmod 777 usb_camera.py
+source /opt/ros/humble/setup.bash && cd $SCRIPT_DIR/../install/sensor_tools/share/sensor_tools/scripts/ && chmod 777 usb_camera.py
 if [ -n "$1" ]; then
-    source ~/pika_ros/install/setup.bash && roslaunch sensor_tools open_multi_gripper.launch l_depth_camera_no:=$l_depth_camera_no r_depth_camera_no:=$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height name:=$1 name_index:=$1_ sub_name:=$2
+    source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_multi_gripper.launch.py l_depth_camera_no:=_$l_depth_camera_no r_depth_camera_no:=_$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps name:=$1 name_index:=$1_
 else
-    source ~/pika_ros/install/setup.bash && roslaunch sensor_tools open_multi_gripper.launch l_depth_camera_no:=$l_depth_camera_no r_depth_camera_no:=$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height
+    source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_multi_gripper.launch.py l_depth_camera_no:=_$l_depth_camera_no r_depth_camera_no:=_$r_depth_camera_no l_serial_port:=$l_serial_port r_serial_port:=$r_serial_port l_fisheye_port:=$l_fisheye_port r_fisheye_port:=$r_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
 fi
                 """
     if select == "3":
@@ -178,6 +181,7 @@ fi
         usb_num1 = 50
         usb_num2 = 60
         content = f"""
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 camera_fps=30
 camera_width=640
 camera_height=480
@@ -191,8 +195,8 @@ sensor_fisheye_port={usb_num1}
 gripper_fisheye_port={usb_num2}
 sudo chmod a+rw /dev/video*
 
-source /opt/ros/noetic/setup.bash && cd ~/pika_ros/install/share/sensor_tools/scripts && chmod 777 usb_camera.py
-source ~/pika_ros/install/setup.bash && roslaunch sensor_tools open_sensor_gripper.launch sensor_depth_camera_no:=$sensor_depth_camera_no gripper_depth_camera_no:=$gripper_depth_camera_no sensor_serial_port:=$sensor_serial_port gripper_serial_port:=$gripper_serial_port sensor_fisheye_port:=$sensor_fisheye_port gripper_fisheye_port:=$gripper_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height
+source /opt/ros/humble/setup.bash && cd $SCRIPT_DIR/../install/sensor_tools/share/sensor_tools/scripts/ && chmod 777 usb_camera.py
+source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_sensor_gripper.launch.py sensor_depth_camera_no:=_$sensor_depth_camera_no gripper_depth_camera_no:=_$gripper_depth_camera_no sensor_serial_port:=$sensor_serial_port gripper_serial_port:=$gripper_serial_port sensor_fisheye_port:=$sensor_fisheye_port gripper_fisheye_port:=$gripper_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
                 """
     with open(path, "w") as f:
         f.write(content)
@@ -256,8 +260,40 @@ def main():
     print(f"2. {start_path}")
     print(f"执行{setup_path}")
     run_command(f"bash {setup_path}")
-    print("执行完成，请拔插设备，注意插入先前绑定的同一个USB口。启动设备方法：")
-    print("启动设备方法：")
+    print("执行完成。")
+    while True:
+        print("请拔插设备，注意插入先前绑定的同一个USB口。然后按回车键检查是否绑定成功...")
+        input()
+        print("请等待...")
+        time.sleep(5)
+        video_list = run_command("ls /dev | grep video")
+        usb_list = run_command("ls /dev | grep ttyUSB")
+        if (select == "1" or select == "3") and video_list.find("50") < 0:
+            print("找不到sensor（左）鱼眼")
+            continue
+        if (select == "1") and video_list.find("51") < 0:
+            print("找不到sensor（右）鱼眼")
+            continue
+        if (select == "2" or select == "3") and video_list.find("60") < 0:
+            print("找不到gripper（左）鱼眼")
+            continue
+        if (select == "2") and video_list.find("61") < 0:
+            print("找不到gripper（右）鱼眼")
+            continue
+        if (select == "1" or select == "3") and usb_list.find("50") < 0:
+            print("找不到sensor（左）串口")
+            continue
+        if (select == "1") and usb_list.find("51") < 0:
+            print("找不到sensor（右）串口")
+            continue
+        if (select == "2" or select == "3") and usb_list.find("60") < 0:
+            print("找不到gripper（左）串口")
+            continue
+        if (select == "2") and usb_list.find("61") < 0:
+            print("找不到gripper（右）串口")
+            continue
+        break
+    print("绑定成功，启动设备方法：")
     print(f"2. 然后运行: bash {start_path}")
 
 
