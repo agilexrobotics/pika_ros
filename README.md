@@ -5,9 +5,8 @@
     <a href="README.md"> English </a> | <a>中文</a> 
   </p>
 </div>
-![ubuntu](https://img.shields.io/badge/Ubuntu-20.04-orange.svg)
-
-![ros](https://img.shields.io/badge/ROS-noetic-blue.svg)
+![ubuntu](https://img.shields.io/badge/Ubuntu-22.04-orange.svg)
+![ROS2](https://img.shields.io/badge/ROS-humble-blue.svg)
 
 ## 介绍
 
@@ -33,7 +32,7 @@ pika 遥操作：https://github.com/agilexrobotics/PikaAnyArm
 ### 软件环境
 
 - 架构：x86_64
-- 操作系统：Ubuntu20.04
-- ROS：noetic
+- 操作系统：Ubuntu22.04
+- ROS：humble
 
 
