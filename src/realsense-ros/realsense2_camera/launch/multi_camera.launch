@@ -1,0 +1,47 @@
+<launch>
+  <arg name="serial_no_camera1"    			default="030522070109"/> 			<!-- Note: Replace with actual serial number -->
+  <arg name="serial_no_camera2"    			default="050422070650"/> 			<!-- Note: Replace with actual serial number -->
+  <!--up 048522073543  down 233622073562-->
+  <arg name="camera1"              			default="camera_l"/>		<!-- Note: Replace with camera name -->
+  <arg name="camera2"              			default="camera_r"/>		<!-- Note: Replace with camera name -->
+  
+  <arg name="tf_prefix_camera1"         default="$(arg camera1)"/>
+  <arg name="tf_prefix_camera2"         default="$(arg camera2)"/>
+  <arg name="initial_reset"             default="false"/>
+  
+  <arg name="reconnect_timeout"         default="6.0"/>
+
+  <arg name="camera_fps" default="30"/>
+  <arg name="camera_width" default="640"/>
+  <arg name="camera_height" default="480"/>
+
+  <group ns="$(arg camera1)">
+    <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+      <arg name="serial_no"             value="$(arg serial_no_camera1)"/>
+      <arg name="tf_prefix"         		value="$(arg tf_prefix_camera1)"/>
+      <arg name="initial_reset"         value="$(arg initial_reset)"/>
+      <arg name="reconnect_timeout"     value="$(arg reconnect_timeout)"/>
+      <arg name="color_fps" value="$(arg camera_fps)"/>
+      <arg name="color_width" value="$(arg camera_width)"/>
+      <arg name="color_height" value="$(arg camera_height)"/>
+      <arg name="depth_fps" value="$(arg camera_fps)"/>
+      <arg name="depth_width" value="$(arg camera_width)"/>
+      <arg name="depth_height" value="$(arg camera_height)"/>
+    </include>
+  </group>
+
+  <group ns="$(arg camera2)">
+    <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+      <arg name="serial_no"             value="$(arg serial_no_camera2)"/>
+      <arg name="tf_prefix"		          value="$(arg tf_prefix_camera2)"/>
+      <arg name="initial_reset"         value="$(arg initial_reset)"/>
+      <arg name="reconnect_timeout"     value="$(arg reconnect_timeout)"/>
+      <arg name="color_fps" value="$(arg camera_fps)"/>
+      <arg name="color_width" value="$(arg camera_width)"/>
+      <arg name="color_height" value="$(arg camera_height)"/>
+      <arg name="depth_fps" value="$(arg camera_fps)"/>
+      <arg name="depth_width" value="$(arg camera_width)"/>
+      <arg name="depth_height" value="$(arg camera_height)"/>
+    </include>
+  </group>
+</launch>

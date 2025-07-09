@@ -1,0 +1,985 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="pika_sensor_description">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.0526291215315274 -2.64717711707593E-06 0.0623289798705541"
+        rpy="0 0 0" />
+      <mass
+        value="0.157180016913411" />
+      <inertia
+        ixx="0.000178248123474744"
+        ixy="-4.55370740220183E-08"
+        ixz="-4.22469375740431E-06"
+        iyy="0.000116975791280587"
+        iyz="8.34834980089626E-08"
+        izz="9.53547931174369E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="center_link">
+    <inertial>
+      <origin
+        xyz="-0.00945031251720393 4.64905891561784E-16 1.05818132034585E-15"
+        rpy="0 0 0" />
+      <mass
+        value="0.00646511303574417" />
+      <inertia
+        ixx="1.69886330111763E-06"
+        ixy="-1.31491690261151E-20"
+        ixz="-1.8126354122922E-20"
+        iyy="1.95031170423133E-06"
+        iyz="-6.0257585050725E-07"
+        izz="1.05459429112543E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/center_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/center_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="center_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="center_link" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-0.5"
+      upper="1.2"
+      effort="100"
+      velocity="1" />
+  </joint>
+  <link
+    name="left_link1">
+    <inertial>
+      <origin
+        xyz="0.00183030261369957 0.00944196905925757 -0.000597775252159641"
+        rpy="0 0 0" />
+      <mass
+        value="0.000816125124495122" />
+      <inertia
+        ixx="6.24701962597735E-08"
+        ixy="-2.05089014511856E-18"
+        ixz="2.30872675450459E-17"
+        iyy="8.74942242706239E-09"
+        iyz="2.98751684188104E-09"
+        izz="5.57484730171003E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_link1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_link1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="jeft_joint1"
+    type="revolute">
+    <origin
+      xyz="0 0.0071865 0.014295"
+      rpy="0 0 0" />
+    <parent
+      link="center_link" />
+    <child
+      link="left_link1" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="-1.0" />
+  </joint>
+  <!-- <link
+    name="left_gripper1">
+    <inertial>
+      <origin
+        xyz="0.0117384904988727 0.00614085724866873 -0.0146796153711032"
+        rpy="0 0 0" />
+      <mass
+        value="0.00848198405705015" />
+      <inertia
+        ixx="1.471984408547E-06"
+        ixy="5.51701058590495E-09"
+        ixz="2.36754669636815E-08"
+        iyy="1.23741466992994E-06"
+        iyz="1.65458935447458E-08"
+        izz="4.24824871911827E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_gripper_joint1"
+    type="revolute">
+    <origin
+      xyz="0 0.020459 -0.0012953"
+      rpy="0 0 0" />
+    <parent
+      link="left_link1" />
+    <child
+      link="left_gripper1" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+  </joint> -->
+  <link
+    name="left_hand_link">
+    <inertial>
+      <origin
+        xyz="-0.0106882114402847 -0.0125554952320645 -0.0579283222918716"
+        rpy="0 0 0" />
+      <mass
+        value="0.0312791454757998" />
+      <inertia
+        ixx="2.88378457590725E-05"
+        ixy="-1.31925993682221E-07"
+        ixz="-5.64500800060229E-07"
+        iyy="2.76752606491321E-05"
+        iyz="-4.99147615869805E-06"
+        izz="2.73776820468248E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_hand_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_hand_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_hand_joint"
+    type="revolute">
+    <origin
+      xyz="0.0175 0.008 -0.0315"
+      rpy="0 0 0" />
+    <parent
+      link="left_gripper_add_1" />
+    <child
+      link="left_hand_link" />
+    <axis
+      xyz="-1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="-0.12" />
+  </joint>
+  <!-- <link
+    name="right_hand_link_add">
+    <inertial>
+      <origin
+        xyz="-0.0103018722550108 0.0129556640249047 -0.0574659152066724"
+        rpy="0 0 0" />
+      <mass
+        value="0.0209887540336027" />
+      <inertia
+        ixx="2.42273571637369E-05"
+        ixy="5.94455479992957E-09"
+        ixz="-3.08795120226136E-07"
+        iyy="2.31296417354162E-05"
+        iyz="4.46216157055521E-06"
+        izz="2.40311321956704E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_hand_link_add.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_hand_link_add.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_hand_joint_add"
+    type="revolute">
+    <origin
+      xyz="0 -0.071291 0"
+      rpy="0 0 0" />
+    <parent
+      link="left_hand_link" />
+    <child
+      link="right_hand_link_add" />
+    <axis
+      xyz="-1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+  </joint> -->
+  <link
+    name="left_link2">
+    <inertial>
+      <origin
+        xyz="-0.00504944243122588 0.0336006243153898 -0.00866310098243702"
+        rpy="0 0 0" />
+      <mass
+        value="0.00239627661817739" />
+      <inertia
+        ixx="1.0018414114424E-06"
+        ixy="-6.91486172562268E-08"
+        ixz="1.78282877950957E-08"
+        iyy="1.01285429465848E-07"
+        iyz="2.30996665587961E-07"
+        izz="9.37669851603353E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_link2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_link2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_joint2"
+    type="revolute">
+    <origin
+      xyz="0 0.014597 0.029037"
+      rpy="0 0 0" />
+    <parent
+      link="center_link" />
+    <child
+      link="left_link2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="-1.0" />
+  </joint>
+  <!-- <link
+    name="left_gripper2">
+    <inertial>
+      <origin
+        xyz="0.0430289151435206 -0.00553865302492387 -0.0144995442531111"
+        rpy="0 0 0" />
+      <mass
+        value="0.0342124377256134" />
+      <inertia
+        ixx="1.55443106325641E-05"
+        ixy="1.48804907776655E-05"
+        ixz="1.52303964317834E-08"
+        iyy="3.53217170521538E-05"
+        iyz="-4.52325016116463E-09"
+        izz="4.07798435835112E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_gripper_joint2"
+    type="revolute">
+    <origin
+      xyz="-0.0033 0.056163 -0.01448"
+      rpy="0 0 0" />
+    <parent
+      link="left_link2" />
+    <child
+      link="left_gripper2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+  </joint> -->
+  <link
+    name="right_link1">
+    <inertial>
+      <origin
+        xyz="0.00183030261369962 -0.00944196905926021 0.000597775252121541"
+        rpy="0 0 0" />
+      <mass
+        value="0.00081612512449512" />
+      <inertia
+        ixx="6.2470196259773E-08"
+        ixy="2.0512816733999E-18"
+        ixz="-2.30873859240121E-17"
+        iyy="8.74942242703806E-09"
+        iyz="2.98751684168963E-09"
+        izz="5.57484730171241E-08" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_link1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_link1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_joint1"
+    type="revolute">
+    <origin
+      xyz="0 -0.0071865 -0.014295"
+      rpy="0 0 0" />
+    <parent
+      link="center_link" />
+    <child
+      link="right_link1" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="-1.0" />
+  </joint>
+  <!-- <link
+    name="right_gripper1">
+    <inertial>
+      <origin
+        xyz="0.0118594556362572 -0.00621129002808397 0.0103776028002364"
+        rpy="0 0 0" />
+      <mass
+        value="0.00831498924359562" />
+      <inertia
+        ixx="1.41008207226372E-06"
+        ixy="-9.75251545760537E-09"
+        ixz="-1.72235070066342E-08"
+        iyy="1.17250869240307E-06"
+        iyz="1.46086455304846E-08"
+        izz="4.1244515567823E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_gripper_joint1"
+    type="revolute">
+    <origin
+      xyz="0 -0.020459 0.0012953"
+      rpy="0 0 0" />
+    <parent
+      link="right_link1" />
+    <child
+      link="right_gripper1" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+  </joint> -->
+  <link
+    name="right_hand_link">
+    <inertial>
+      <origin
+        xyz="-0.0103018722550108 0.0129556640249047 -0.0574659152066724"
+        rpy="0 0 0" />
+      <mass
+        value="0.0209887540336027" />
+      <inertia
+        ixx="2.42273571637369E-05"
+        ixy="5.94455479992964E-09"
+        ixz="-3.08795120226136E-07"
+        iyy="2.31296417354162E-05"
+        iyz="4.46216157055521E-06"
+        izz="2.40311321956704E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_hand_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_hand_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_hand_joint"
+    type="revolute">
+    <origin
+      xyz="0.0175 -0.008 -0.0055"
+      rpy="0 0 0" />
+    <parent
+      link="right_gripper_add_1" />
+    <child
+      link="right_hand_link" />
+    <axis
+      xyz="-1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="0.12" />
+  </joint>
+  <link
+    name="right_link2">
+    <inertial>
+      <origin
+        xyz="-4.94424572495822E-05 -0.033600624227165 0.00866310117801212"
+        rpy="0 0 0" />
+      <mass
+        value="0.00239627661581539" />
+      <inertia
+        ixx="1.00184140989372E-06"
+        ixy="6.91486167298385E-08"
+        ixz="-1.7828286546402E-08"
+        iyy="1.01285431642108E-07"
+        iyz="2.3099666892822E-07"
+        izz="9.37669847666938E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_link2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_link2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_joint2"
+    type="revolute">
+    <origin
+      xyz="-0.005 -0.014597 -0.029037"
+      rpy="0 0 0" />
+    <parent
+      link="center_link" />
+    <child
+      link="right_link2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="-1.0" />
+  </joint>
+  <!-- <link
+    name="right_gripper2">
+    <inertial>
+      <origin
+        xyz="0.0430289151475184 0.0070293598411741 0.014501052697465"
+        rpy="0 0 0" />
+      <mass
+        value="0.0342124377285846" />
+      <inertia
+        ixx="1.55443106330791E-05"
+        ixy="-1.4880490779163E-05"
+        ixz="-1.51854213874754E-08"
+        iyy="3.53217170580027E-05"
+        iyz="-4.52325037356429E-09"
+        izz="4.0779843589649E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_gripper_joint2"
+    type="revolute">
+    <origin
+      xyz="0.0017 -0.056163 0.01448"
+      rpy="0 0 0" />
+    <parent
+      link="right_link2" />
+    <child
+      link="right_gripper2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-3.1416"
+      upper="3.1416"
+      effort="100"
+      velocity="1" />
+  </joint> -->
+  <link
+    name="left_gripper_add_1">
+    <inertial>
+      <origin
+        xyz="0.0117384904988726 0.00614085724866872 -0.0146796153711032"
+        rpy="0 0 0" />
+      <mass
+        value="0.00848198405705015" />
+      <inertia
+        ixx="1.471984408547E-06"
+        ixy="5.51701058590495E-09"
+        ixz="2.36754669636815E-08"
+        iyy="1.23741466992994E-06"
+        iyz="1.65458935447458E-08"
+        izz="4.24824871911827E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper_add_1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper_add_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_gripper_add_joint1"
+    type="prismatic">
+    <origin
+      xyz="0 0.027646 0.013"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="left_gripper_add_1" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.1"
+      upper="0.1"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="-0.015" />
+  </joint>
+  <link
+    name="left_gripper_add_2">
+    <inertial>
+      <origin
+        xyz="0.0430289151435207 -0.00553865302492387 -0.0144995442531111"
+        rpy="0 0 0" />
+      <mass
+        value="0.0342124377256133" />
+      <inertia
+        ixx="1.55443106325641E-05"
+        ixy="1.48804907776655E-05"
+        ixz="1.52303964317812E-08"
+        iyy="3.53217170521538E-05"
+        iyz="-4.52325016116432E-09"
+        izz="4.07798435835112E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper_add_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/left_gripper_add_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_gripper_add_joint2"
+    type="prismatic">
+    <origin
+      xyz="-0.0033 0.070761 0.014557"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="left_gripper_add_2" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.1"
+      upper="0.1"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="-0.032" />
+  </joint>
+  <link
+    name="right_gripper_add_1">
+    <inertial>
+      <origin
+        xyz="0.0118594556362572 -0.00621129002808396 0.0103776028002364"
+        rpy="0 0 0" />
+      <mass
+        value="0.00831498924359562" />
+      <inertia
+        ixx="1.41008207226372E-06"
+        ixy="-9.75251545760538E-09"
+        ixz="-1.72235070066342E-08"
+        iyy="1.17250869240307E-06"
+        iyz="1.46086455304846E-08"
+        izz="4.1244515567823E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper_add_1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper_add_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_gripper_add_joint1"
+    type="prismatic">
+    <origin
+      xyz="0 -0.027646 -0.013"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="right_gripper_add_1" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.1"
+      upper="0.1"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="0.015" />
+  </joint>
+  <link
+    name="right_gripper_add_2">
+    <inertial>
+      <origin
+        xyz="0.0430289151475183 0.0070293598411741 0.014501052697465"
+        rpy="0 0 0" />
+      <mass
+        value="0.0342124377285846" />
+      <inertia
+        ixx="1.55443106330791E-05"
+        ixy="-1.4880490779163E-05"
+        ixz="-1.5185421387475E-08"
+        iyy="3.53217170580027E-05"
+        iyz="-4.52325037356415E-09"
+        izz="4.0779843589649E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper_add_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_sensor_description/meshes/right_gripper_add_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_gripper_add_joint2"
+    type="prismatic">
+    <origin
+      xyz="-0.0033 -0.070761 -0.014557"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="right_gripper_add_2" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.1"
+      upper="0.1"
+      effort="100"
+      velocity="1" />
+    <mimic joint="center_joint" multiplier="0.032" />
+  </joint>
+</robot>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="pika_gripper_description">
+  <link
+    name="gripper_base_link">
+    <inertial>
+      <origin
+        xyz="0.037477 -8.1437E-07 0.0084053"
+        rpy="0 0 0" />
+      <mass
+        value="0.18972" />
+      <inertia
+        ixx="0.0002159"
+        ixy="3.3333E-08"
+        ixz="-2.6278E-06"
+        iyy="0.00014308"
+        iyz="1.6782E-08"
+        izz="0.00011036" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_gripper_description/meshes/gripper_base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_gripper_description/meshes/gripper_base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="gripper_left_link">
+    <inertial>
+      <origin
+        xyz="0.033255 -0.014661 -0.0057614"
+        rpy="0 0 0" />
+      <mass
+        value="0.033674" />
+      <inertia
+        ixx="1.5284E-05"
+        ixy="1.4473E-05"
+        ixz="1.4911E-08"
+        iyy="3.448E-05"
+        iyz="-4.3614E-09"
+        izz="3.9744E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_gripper_description/meshes/gripper_left_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_gripper_description/meshes/gripper_left_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_left_joint"
+    type="prismatic">
+    <origin
+      xyz="0.0815 0.08851 0.0064182"
+      rpy="0 0 0" />
+    <parent
+      link="gripper_base_link" />
+    <child
+      link="gripper_left_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="-0.05"
+      upper="0"
+      effort="100"
+      velocity="5" />
+  </joint>
+  <link
+    name="gripper_right_link">
+    <inertial>
+      <origin
+        xyz="0.033255 0.014661 -0.0058113"
+        rpy="0 0 0" />
+      <mass
+        value="0.033674" />
+      <inertia
+        ixx="1.5284E-05"
+        ixy="-1.4473E-05"
+        ixz="-1.4956E-08"
+        iyy="3.448E-05"
+        iyz="-4.3614E-09"
+        izz="3.9744E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_gripper_description/meshes/gripper_right_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://pika_gripper_description/meshes/gripper_right_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_right_joint"
+    type="prismatic">
+    <origin
+      xyz="0.0815 -0.088529 0.0064182"
+      rpy="0 0 0" />
+    <parent
+      link="gripper_base_link" />
+    <child
+      link="gripper_right_link" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="0"
+      upper="0.05"
+      effort="100"
+      velocity="5" />
+  </joint>
+</robot>
