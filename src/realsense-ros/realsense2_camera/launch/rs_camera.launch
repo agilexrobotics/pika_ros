@@ -49,7 +49,7 @@
   <arg name="allow_no_texture_points"   default="false"/>
   <arg name="ordered_pc"                default="false"/>
 
-  <arg name="enable_sync"               default="false"/>
+  <arg name="enable_sync"               default="true"/>
   <arg name="align_depth"               default="true"/>
 
   <arg name="publish_tf"                default="true"/>
