@@ -1,0 +1,6 @@
+[submodule "src/data_msgs"]
+	path = src/data_msgs
+	url = https://github.com/agilexrobotics/data_msgs.git
+[submodule "src/data_tools"]
+	path = src/data_tools
+	url = https://github.com/agilexrobotics/data_tools.git

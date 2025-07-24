@@ -1,0 +1,78 @@
+<launch>
+    <arg name="sensor_fisheye_port" default="22" />
+    <arg name="gripper_fisheye_port" default="23" />
+    <arg name="sensor_serial_port" default="/dev/ttyUSB0" />
+    <arg name="gripper_serial_port" default="/dev/ttyUSB1" />
+    <arg name="sensor_depth_camera_no" default="230322270688" />
+    <arg name="gripper_depth_camera_no" default="230322272619" />
+    <arg name="sensor_joint_name" default="sensor_gripper_center_joint" />
+    <arg name="gripper_joint_name" default="gripper_gripper_center_joint" />
+
+    <arg name="camera_fps" default="30"/>
+    <arg name="camera_width" default="640"/>
+    <arg name="camera_height" default="480"/>
+
+    <arg name="motor_current_limit" default="1000" />
+    <arg name="motor_current_redundancy" default="500" />
+    <arg name="ctrl_rate" default="50" />
+
+	<node pkg="sensor_tools" name="sensor_serial_gripper_imu" type="serial_gripper_imu" output="screen" respawn="true">
+	    <param name="serial_port" value="$(arg sensor_serial_port)"/>
+        <param name="joint_name" value="$(arg sensor_joint_name)"/>
+        <remap from="/imu/data" to="/sensor/imu/data"/>
+        <remap from="/gripper/data" to="/sensor/gripper/data"/>
+        <remap from="/gripper/ctrl" to="/sensor/gripper/ctrl"/>
+        <remap from="/gripper/joint_state" to="/sensor/gripper/joint_state"/>
+        <remap from="/gripper/joint_state_ctrl" to="/sensor/gripper/joint_state_ctrl"/>
+        <remap from="/joint_state_info" to="/joint_states"/>
+        <remap from="/joint_state_gripper" to="/joint_states_gripper"/>
+        <remap from="/data_capture_status" to="/data_tools_dataCapture/status"/>
+        <remap from="/teleop_status" to="/teleop_status"/>
+        <remap from="/localization_status" to="/pika_localization_status"/>
+        <remap from="/arm_control_status" to="/arm_control_status"/>
+	</node>
+	<node pkg="sensor_tools" name="gripper_serial_gripper_imu" type="serial_gripper_imu" output="screen" respawn="true">
+	    <param name="serial_port" value="$(arg gripper_serial_port)"/>
+        <param name="joint_name" value="$(arg gripper_joint_name)"/>
+        <param name="motor_current_limit" value="$(arg motor_current_limit)"/>
+        <param name="motor_current_redundancy" value="$(arg motor_current_redundancy)"/>
+        <param name="ctrl_rate" value="$(arg ctrl_rate)"/>
+        <remap from="/imu/data" to="/gripper/imu/data"/>
+        <remap from="/gripper/data" to="/gripper/gripper/data"/>
+        <remap from="/gripper/ctrl" to="/gripper/gripper/ctrl"/>
+        <remap from="/gripper/joint_state" to="/gripper/gripper/joint_state"/>
+        <remap from="/gripper/joint_state_ctrl" to="/sensor/gripper/joint_state"/>
+        <remap from="/joint_state_info" to="/joint_states_single"/>
+        <remap from="/joint_state_gripper" to="/joint_states_single_gripper"/>
+	</node>
+    <node pkg="sensor_tools" name="sensor_camera_fisheye" type="usb_camera.py" output="screen" respawn="true">
+        <param name="camera_port" value="$(arg sensor_fisheye_port)"/>
+        <param name="camera_fps" value="$(arg camera_fps)"/>
+        <param name="camera_width" value="$(arg camera_width)"/>
+        <param name="camera_height" value="$(arg camera_height)"/>
+        <param name="camera_frame_id" value="sensor/camera_fisheye_link"/>
+        <remap from="/camera_rgb/color/image_raw" to="/sensor/camera_fisheye/color/image_raw"/>
+        <remap from="/camera_rgb/color/camera_info" to="/sensor/camera_fisheye/color/camera_info"/>
+    </node>
+    <node pkg="sensor_tools" name="gripper_camera_fisheye" type="usb_camera.py" output="screen" respawn="true">
+        <param name="camera_port" value="$(arg gripper_fisheye_port)"/>
+        <param name="camera_fps" value="$(arg camera_fps)"/>
+        <param name="camera_width" value="$(arg camera_width)"/>
+        <param name="camera_height" value="$(arg camera_height)"/>
+        <param name="camera_frame_id" value="gripper/camera_fisheye_link"/>
+        <remap from="/camera_rgb/color/image_raw" to="/gripper/camera_fisheye/color/image_raw"/>
+        <remap from="/camera_rgb/color/camera_info" to="/gripper/camera_fisheye/color/camera_info"/>
+    </node>
+    <include file="$(find pika_locator)/launch/pika_single_locator.launch"/>
+    <include file="$(find realsense2_camera)/launch/multi_camera.launch">
+        <arg name="serial_no_camera1" value="$(arg sensor_depth_camera_no)"/>
+        <arg name="serial_no_camera2" value="$(arg gripper_depth_camera_no)"/>
+        <arg name="camera1" value="sensor/camera"/>
+        <arg name="camera2" value="gripper/camera"/>
+
+        <arg name="camera_fps" value="$(arg camera_fps)"/>
+        <arg name="camera_width" value="$(arg camera_width)"/>
+        <arg name="camera_height" value="$(arg camera_height)"/>
+    </include>
+</launch>
+

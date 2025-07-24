@@ -1,0 +1,46 @@
+<launch>
+    <arg name="fisheye_port" default="22" />
+    <arg name="serial_port" default="/dev/ttyUSB0" />
+    <arg name="joint_name" default="center_joint" />
+
+    <arg name="camera_fps" default="30" />
+    <arg name="camera_width" default="640" />
+    <arg name="camera_height" default="480" />
+
+	<node pkg="sensor_tools" name="serial_gripper_imu" type="serial_gripper_imu" output="screen" respawn="true">
+        <param name="joint_name" value="$(arg joint_name)"/>
+	    <param name="serial_port" value="$(arg serial_port)"/>
+        <remap from="/imu/data" to="/imu/data"/>
+        <remap from="/gripper/data" to="/gripper/data"/>
+        <remap from="/gripper/ctrl" to="/gripper/ctrl"/>
+        <remap from="/gripper/joint_state" to="/gripper/joint_state"/>
+        <remap from="/gripper/joint_state_ctrl" to="/joint_states"/>
+        <remap from="/joint_state_info" to="/joint_states"/>
+        <remap from="/joint_state_gripper" to="/joint_states_gripper"/>
+        <remap from="/data_capture_status" to="/data_tools_dataCapture/status"/>
+        <remap from="/teleop_status" to="/teleop_status"/>
+        <remap from="/localization_status" to="/pika_localization_status"/>
+        <remap from="/arm_control_status" to="/arm_control_status"/>
+	</node>
+    <node pkg="sensor_tools" name="camera_fisheye" type="usb_camera.py" output="screen" respawn="true">
+        <param name="camera_port" value="$(arg fisheye_port)"/>
+        <param name="camera_fps" value="$(arg camera_fps)"/>
+        <param name="camera_width" value="$(arg camera_width)"/>
+        <param name="camera_height" value="$(arg camera_height)"/>
+        <param name="camera_frame_id" value="camera_fisheye_link"/>
+        <remap from="/camera_rgb/color/image_raw" to="/camera_fisheye/color/image_raw"/>
+        <remap from="/camera_rgb/color/camera_info" to="/camera_fisheye/color/camera_info"/>
+    </node>
+    <include file="$(find pika_locator)/launch/pika_single_locator.launch"/>
+
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+        <arg name="color_fps" value="$(arg camera_fps)"/>
+        <arg name="color_width" value="$(arg camera_width)"/>
+        <arg name="color_height" value="$(arg camera_height)"/>
+
+        <arg name="depth_fps" value="$(arg camera_fps)"/>
+        <arg name="depth_width" value="$(arg camera_width)"/>
+        <arg name="depth_height" value="$(arg camera_height)"/>
+    </include>
+    
+</launch>
