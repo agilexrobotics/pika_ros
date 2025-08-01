@@ -414,6 +414,7 @@ class RosOperator{
 		}
 		if(msg->velocity.size() > 0 && msg->velocity.back() != 0 && velocity != msg->velocity.back()){
 			velocity = msg->velocity.back();
+			this->velocity = velocity;
 			std::vector<uint8_t> command = createBinaryCommand<float>(VELOCITY_CTRL, std::vector<float>{velocity, velocity});
 			std::lock_guard<std::mutex> lock(serialMtx);
 			if(serial && serial->is_open()){
@@ -490,6 +491,7 @@ class RosOperator{
 			if(msg->effort != 0 && msg->effort != effort){
 				std::vector<uint8_t> command = createBinaryCommand<float>(EFFORT_CTRL, std::vector<float>{msg->effort});
 				effort = msg->effort;
+				this->effort = effort;
 				std::lock_guard<std::mutex> lock(serialMtx);
 				if(serial && serial->is_open()){
 					boost::asio::write(*serial, boost::asio::buffer(command));
@@ -498,6 +500,7 @@ class RosOperator{
 			if(msg->velocity != 0 && msg->velocity != velocity){
 				std::vector<uint8_t> command = createBinaryCommand<float>(VELOCITY_CTRL, std::vector<float>{msg->velocity, msg->velocity});
 				velocity = msg->velocity;
+				this->velocity = velocity;
 				std::lock_guard<std::mutex> lock(serialMtx);
 				if(serial && serial->is_open()){
 					boost::asio::write(*serial, boost::asio::buffer(command));
