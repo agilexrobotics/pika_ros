@@ -43,6 +43,7 @@ enum Send_Flag{
 	EFFORT_CTRL = 20,
 	VELOCITY_CTRL = 13,
 	POSITION_CTRL = 22,
+	// POSITION_CTRL_MIT = 23,
 	LIGHT_CTRL = 50,
 	VIBRATE_CTRL = 51
 };
@@ -399,6 +400,7 @@ class RosOperator: public rclcpp::Node{
 		}
 		if(msg->velocity.size() > 0 && msg->velocity.back() != 0 && velocity != msg->velocity.back()){
 			velocity = msg->velocity.back();
+			this->velocity = velocity;
 			std::vector<uint8_t> command = createBinaryCommand<float>(VELOCITY_CTRL, std::vector<float>{velocity, velocity});
 			std::lock_guard<std::mutex> lock(serialMtx);
 			if(serial && serial->is_open()){
@@ -474,6 +476,7 @@ class RosOperator: public rclcpp::Node{
 			if(msg->effort != 0 && msg->effort != effort){
 				std::vector<uint8_t> command = createBinaryCommand<float>(EFFORT_CTRL, std::vector<float>{msg->effort});
 				effort = msg->effort;
+				this->effort = effort;
 				std::lock_guard<std::mutex> lock(serialMtx);
 				if(serial && serial->is_open()){
 					boost::asio::write(*serial, boost::asio::buffer(command));
@@ -482,6 +485,7 @@ class RosOperator: public rclcpp::Node{
 			if(msg->velocity != 0 && msg->velocity != velocity){
 				std::vector<uint8_t> command = createBinaryCommand<float>(VELOCITY_CTRL, std::vector<float>{msg->velocity, msg->velocity});
 				velocity = msg->velocity;
+				this->velocity = velocity;
 				std::lock_guard<std::mutex> lock(serialMtx);
 				if(serial && serial->is_open()){
 					boost::asio::write(*serial, boost::asio::buffer(command));
