@@ -24,7 +24,7 @@
         <remap from="/gripper/joint_state_ctrl" to="$(arg name)/joint_states_l"/>
         <remap from="/joint_state_info" to="/joint_states_l"/>
         <remap from="/joint_state_gripper" to="/joint_states_gripper_l"/>
-        <remap from="/teleop_piper_status" to="/teleop_piper_status_l"/>
+        <remap from="/teleop_trigger" to="/teleop_trigger_l"/>
         <remap from="/data_capture_status" to="/data_tools_dataCapture/status"/>
         <remap from="/teleop_status" to="/teleop_status_l"/>
         <remap from="/localization_status" to="/pika_localization_status_l"/>
@@ -40,7 +40,7 @@
         <remap from="/gripper/joint_state_ctrl" to="$(arg name)/joint_states_r"/>
         <remap from="/joint_state_info" to="/joint_states_r"/>
         <remap from="/joint_state_gripper" to="/joint_states_gripper_r"/>
-        <remap from="/teleop_piper_status" to="/teleop_piper_status_r"/>
+        <remap from="/teleop_trigger" to="/teleop_trigger_r"/>
         <remap from="/data_capture_status" to="/data_tools_dataCapture/status"/>
         <remap from="/teleop_status" to="/teleop_status_l"/>
         <remap from="/localization_status" to="/pika_localization_status_l"/>

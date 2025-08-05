@@ -28,6 +28,8 @@ class RosOperator:
         self.camera_height = rospy.get_param("~camera_height", 480)
         self.camera_width = rospy.get_param("~camera_width", 640)
         self.camera_frame_id = rospy.get_param("~camera_frame_id", "camera_rgb")
+        if self.camera_frame_id.startswith('/'):
+            self.camera_frame_id = self.camera_frame_id[1:]
         self.bridge = CvBridge()
         self.camera_color_publisher = rospy.Publisher("/camera_rgb/color/image_raw", Image, queue_size=10)
         self.camera_config_publisher = rospy.Publisher("/camera_rgb/color/camera_info", CameraInfo, queue_size=10)
