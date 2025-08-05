@@ -111,7 +111,7 @@ def generate_launch_description():
                          'camera_fps': camera_fps,
                          'camera_height': camera_height,
                          'camera_width': camera_width,
-                         'camera_frame_id': [name_index,TextSubstitution(text="camera_fisheye_l_link")]}],
+                         'camera_frame_id': [name,TextSubstitution(text="/camera_fisheye_l_link")]}],
             remappings=[
                 ('/camera_rgb/color/image_raw', [name,TextSubstitution(text='/camera_fisheye_l/color/image_raw')]),
                 ('/camera_rgb/color/camera_info', [name,TextSubstitution(text='/camera_fisheye_l/color/camera_info')])
@@ -127,7 +127,7 @@ def generate_launch_description():
                          'camera_fps': camera_fps,
                          'camera_height': camera_height,
                          'camera_width': camera_width,
-                         'camera_frame_id': [name_index,TextSubstitution(text="camera_fisheye_r_link")]}],
+                         'camera_frame_id': [name,TextSubstitution(text="/camera_fisheye_r_link")]}],
             remappings=[
                 ('/camera_rgb/color/image_raw', [name,TextSubstitution(text='/camera_fisheye_r/color/image_raw')]),
                 ('/camera_rgb/color/camera_info', [name,TextSubstitution(text='/camera_fisheye_r/color/camera_info')])

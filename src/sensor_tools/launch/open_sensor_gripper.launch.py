@@ -80,7 +80,7 @@ def generate_launch_description():
                          'camera_fps': camera_fps,
                          'camera_height': camera_height,
                          'camera_width': camera_width,
-                         'camera_frame_id': "sensor_camera_fisheye_link"}],
+                         'camera_frame_id': "sensor/camera_fisheye_link"}],
             remappings=[
                 ('/camera_rgb/color/image_raw', '/sensor/camera_fisheye/color/image_raw'),
                 ('/camera_rgb/color/camera_info', '/sensor/camera_fisheye/color/camera_info')
@@ -96,7 +96,7 @@ def generate_launch_description():
                          'camera_fps': camera_fps,
                          'camera_height': camera_height,
                          'camera_width': camera_width,
-                         'camera_frame_id': "gripper_camera_fisheye_link"}],
+                         'camera_frame_id': "gripper/camera_fisheye_link"}],
             remappings=[
                 ('/camera_rgb/color/image_raw', '/gripper/camera_fisheye/color/image_raw'),
                 ('/camera_rgb/color/camera_info', '/gripper/camera_fisheye/color/camera_info')

@@ -40,6 +40,8 @@ class RosOperator(Node):
         self.camera_height = int(self.get_parameter('camera_height').get_parameter_value().integer_value)
         self.camera_width = int(self.get_parameter('camera_width').get_parameter_value().integer_value)
         self.camera_frame_id = self.get_parameter('camera_frame_id').get_parameter_value().string_value
+        if self.camera_frame_id.startswith('/'):
+            self.camera_frame_id = self.camera_frame_id[1:]
         self.bridge = CvBridge()
         self.camera_color_publisher = self.create_publisher(Image, '/camera_rgb/color/image_raw', 10)
         self.camera_config_publisher = self.create_publisher(CameraInfo, '/camera_rgb/color/camera_info', 10)
@@ -102,7 +104,6 @@ class RosOperator(Node):
 
     def publish_camera_color(self, color):
         img = self.bridge.cv2_to_imgmsg(color, "bgr8")
-        img.header.frame_id = "camera"
         img.header.stamp = self.get_clock().now().to_msg()
         img.header.frame_id = self.camera_frame_id + "_color"
         self.camera_color_publisher.publish(img)
