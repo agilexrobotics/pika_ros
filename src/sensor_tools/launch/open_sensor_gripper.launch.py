@@ -27,6 +27,7 @@ def generate_launch_description():
         DeclareLaunchArgument('gripper_joint_name', default_value='gripper_gripper_center_joint'),
         DeclareLaunchArgument('motor_current_limit', default_value='1000.0'),
         DeclareLaunchArgument('motor_current_redundancy', default_value='500.0'),
+        DeclareLaunchArgument('mit_mode', default_value='true'),
         DeclareLaunchArgument('ctrl_rate', default_value='50.0')
     ]
     camera_fps = LaunchConfiguration('camera_fps')
@@ -43,6 +44,7 @@ def generate_launch_description():
     gripper_joint_name = LaunchConfiguration('gripper_joint_name')
     motor_current_limit = LaunchConfiguration('motor_current_limit')
     motor_current_redundancy = LaunchConfiguration('motor_current_redundancy')
+    mit_mode = LaunchConfiguration('mit_mode')
     ctrl_rate = LaunchConfiguration('ctrl_rate')
 
     locator_launch = IncludeLaunchDescription(
@@ -134,6 +136,7 @@ def generate_launch_description():
                          'joint_name': gripper_joint_name,
                          'motor_current_limit': motor_current_limit,
                          'motor_current_redundancy': motor_current_redundancy,
+                         'mit_mode': mit_mode,
                          'ctrl_rate': ctrl_rate}],
             remappings=[
                 ('/imu/data', '/imu/data'),

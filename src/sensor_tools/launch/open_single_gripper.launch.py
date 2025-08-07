@@ -23,6 +23,7 @@ def generate_launch_description():
         DeclareLaunchArgument('joint_name', default_value='center_joint'),
         DeclareLaunchArgument('motor_current_limit', default_value='1000.0'),
         DeclareLaunchArgument('motor_current_redundancy', default_value='500.0'),
+        DeclareLaunchArgument('mit_mode', default_value='true'),
         DeclareLaunchArgument('ctrl_rate', default_value='50.0')
     ]
 
@@ -35,6 +36,7 @@ def generate_launch_description():
     joint_name = LaunchConfiguration('joint_name')
     motor_current_limit = LaunchConfiguration('motor_current_limit')
     motor_current_redundancy = LaunchConfiguration('motor_current_redundancy')
+    mit_mode = LaunchConfiguration('mit_mode')
     ctrl_rate = LaunchConfiguration('ctrl_rate')
 
     depth_camera_launch = IncludeLaunchDescription(
@@ -70,6 +72,7 @@ def generate_launch_description():
                          'joint_name': joint_name,
                          'motor_current_limit': motor_current_limit,
                          'motor_current_redundancy': motor_current_redundancy,
+                         'mit_mode': mit_mode,
                          'ctrl_rate': ctrl_rate}],
             remappings=[
                 ('/imu/data', '/imu/data'),
