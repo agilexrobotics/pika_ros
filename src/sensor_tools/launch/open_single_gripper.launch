@@ -9,6 +9,7 @@
 
     <arg name="motor_current_limit" default="1000" />
     <arg name="motor_current_redundancy" default="500" />
+    <arg name="mit_mode" default="true" />
     <arg name="ctrl_rate" default="50" />
 
 	<node pkg="sensor_tools" name="serial_gripper_imu" type="serial_gripper_imu" output="screen" respawn="true">
@@ -16,6 +17,7 @@
 	    <param name="serial_port" value="$(arg serial_port)"/>
         <param name="motor_current_limit" value="$(arg motor_current_limit)"/>
         <param name="motor_current_redundancy" value="$(arg motor_current_redundancy)"/>
+        <param name="mit_mode" value="$(arg mit_mode)"/>
         <param name="ctrl_rate" value="$(arg ctrl_rate)"/>
         <remap from="/imu/data" to="/imu/data"/>
         <remap from="/gripper/data" to="/gripper/data"/>

@@ -43,9 +43,10 @@ enum Send_Flag{
 	DISABLE = 10,
 	ENABLE = 11,
 	SET_ZERO = 12,
-	EFFORT_CTRL = 20,
 	VELOCITY_CTRL = 13,
-	POSITION_CTRL = 22,
+	EFFORT_CTRL = 15,
+	POSITION_CTRL_MIT = 22,
+	POSITION_CTRL_POS_VEL = 23,
 	LIGHT_CTRL = 50,
 	VIBRATE_CTRL = 51
 };
@@ -147,6 +148,8 @@ class RosOperator{
 	std::thread *receivingThread;
 	std::thread *statusSendingThread;
 
+	bool mitMode;
+
 	template<typename T>
 	std::vector<uint8_t> createBinaryCommand(uint8_t cmd, std::vector<T> values = std::vector<T>{0.0f}, bool bigEndian = false) {
 		std::vector<uint8_t> binaryCmd;
@@ -189,6 +192,7 @@ class RosOperator{
 		nh.param<float>("motor_current_limit", motorCurrentLimit, 1000);
 		nh.param<float>("motor_current_redundancy", motorCurrentRedundancy, 500);
 		nh.param<float>("ctrl_rate", ctrlRate, 50);
+		nh.param<bool>("mit_mode", mitMode, true);
 		ctrlFreq = 1.0/ctrlRate;
         char resolvedPath[PATH_MAX];
 		if(serialPort == "/dev/ttyUSB60" || serialPort == "/dev/ttyUSB61")
@@ -396,17 +400,25 @@ class RosOperator{
 
 	void jointStateCtrlHandler(const sensor_msgs::JointState::ConstPtr& msg){
 		static double jointStateCtrlTime = -1;
-		std::cout<<"jointStateCtrlHandler:"<<ctrlFreq<<std::endl;
-		std::cout<<"jointStateCtrlHandler:"<<(msg->header.stamp.toSec() - jointStateCtrlTime)<<std::endl;
 		if(msg->header.stamp.toSec() - jointStateCtrlTime < ctrlFreq)
 			return;
 		jointStateCtrlTime = msg->header.stamp.toSec();
 		receiveDataMtx.lock();
 		bool enable = this->enable;
 		float velocity = this->velocity;
+		float effort = this->effort;
 		receiveDataMtx.unlock();
 		if(!enable){
 			std::vector<uint8_t> command = createBinaryCommand<float>(ENABLE, std::vector<float>{0.0f});
+			std::lock_guard<std::mutex> lock(serialMtx);
+			if(serial && serial->is_open()){
+				boost::asio::write(*serial, boost::asio::buffer(command));
+			}
+		}
+		if(msg->effort.size() > 0 && msg->effort.back() != 0 && effort != msg->effort.back()){
+			effort = msg->effort.back();
+			this->effort = effort;
+			std::vector<uint8_t> command = createBinaryCommand<float>(EFFORT_CTRL, std::vector<float>{effort});
 			std::lock_guard<std::mutex> lock(serialMtx);
 			if(serial && serial->is_open()){
 				boost::asio::write(*serial, boost::asio::buffer(command));
@@ -437,10 +449,9 @@ class RosOperator{
 			if(motorCurrent > 0 && angle > motorAngle)
 				return;
 		}
-		std::vector<uint8_t> command = createBinaryCommand<float>(POSITION_CTRL, std::vector<float>{angle});
+		std::vector<uint8_t> command = createBinaryCommand<float>(mitMode?POSITION_CTRL_MIT:POSITION_CTRL_POS_VEL, std::vector<float>{angle});
 		std::lock_guard<std::mutex> lock(serialMtx);
 		if(serial && serial->is_open()){
-			std::cout<<"pub"<<std::endl;
 			boost::asio::write(*serial, boost::asio::buffer(command));
 			lastCommandAngle = angle;
 		}
@@ -525,7 +536,7 @@ class RosOperator{
 				if(motorCurrent > 0 && angle > motorAngle)
 					return;
 			}
-			std::vector<uint8_t> command = createBinaryCommand<float>(POSITION_CTRL, std::vector<float>{angle});
+			std::vector<uint8_t> command = createBinaryCommand<float>(mitMode?POSITION_CTRL_MIT:POSITION_CTRL_POS_VEL, std::vector<float>{angle});
 			std::lock_guard<std::mutex> lock(serialMtx);
 			if(serial && serial->is_open()){
 				boost::asio::write(*serial, boost::asio::buffer(command));
@@ -760,7 +771,7 @@ class RosOperator{
 									step = 0.01;
 								if(gripper.effort > 0)
 									step = -0.01;
-								std::vector<uint8_t> command = createBinaryCommand<float>(POSITION_CTRL, std::vector<float>{gripper.angle+step});
+								std::vector<uint8_t> command = createBinaryCommand<float>(mitMode?POSITION_CTRL_MIT:POSITION_CTRL_POS_VEL, std::vector<float>{gripper.angle+step});
 								std::lock_guard<std::mutex> lock(serialMtx);
 								if(!((step > 0 && lastCommandAngle > gripper.angle+step) || (step < 0 && lastCommandAngle < gripper.angle+step))){
 									if(serial && serial->is_open()){
