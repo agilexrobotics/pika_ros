@@ -6,3 +6,6 @@
 	path = src/data_tools
 	url = https://github.com/agilexrobotics/data_tools.git
 	branch = ros2
+[submodule "src/PikaAnyArm"]
+	path = src/PikaAnyArm
+	url = https://github.com/agilexrobotics/PikaAnyArm.git
