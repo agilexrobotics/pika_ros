@@ -150,6 +150,8 @@ class RosOperator{
 
 	bool mitMode;
 
+	ros::NodeHandle *nh;
+
 	template<typename T>
 	std::vector<uint8_t> createBinaryCommand(uint8_t cmd, std::vector<T> values = std::vector<T>{0.0f}, bool bigEndian = false) {
 		std::vector<uint8_t> binaryCmd;
@@ -187,12 +189,12 @@ class RosOperator{
 	}
 
     RosOperator(){
-		ros::NodeHandle nh("~");
-		nh.param<std::string>("serial_port", serialPort, "/dev/ttyUSB0");
-		nh.param<float>("motor_current_limit", motorCurrentLimit, 1000);
-		nh.param<float>("motor_current_redundancy", motorCurrentRedundancy, 500);
-		nh.param<float>("ctrl_rate", ctrlRate, 50);
-		nh.param<bool>("mit_mode", mitMode, true);
+		nh = new ros::NodeHandle("~");
+		nh->param<std::string>("serial_port", serialPort, "/dev/ttyUSB0");
+		nh->param<float>("motor_current_limit", motorCurrentLimit, 1000);
+		nh->param<float>("motor_current_redundancy", motorCurrentRedundancy, 500);
+		nh->param<float>("ctrl_rate", ctrlRate, 50);
+		nh->param<bool>("mit_mode", mitMode, true);
 		ctrlFreq = 1.0/ctrlRate;
         char resolvedPath[PATH_MAX];
 		if(serialPort == "/dev/ttyUSB60" || serialPort == "/dev/ttyUSB61")
@@ -201,8 +203,8 @@ class RosOperator{
 		if(ret >= 0){
 			serialPort = "/dev/" + std::string(resolvedPath);
 		}
-		nh.param<std::string>("joint_name", jointName, "center_joint");
-		nh.param<std::string>("ctrl_mode", ctrlMode, "collection");
+		nh->param<std::string>("joint_name", jointName, "center_joint");
+		nh->param<std::string>("ctrl_mode", ctrlMode, "collection");
 
 		// std::cout<<serialPort<<std::endl;
 
@@ -268,24 +270,24 @@ class RosOperator{
 			serial->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
 			serial->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
 			
-			ros::NodeHandle nh("~");
-			pubImu = nh.advertise<sensor_msgs::Imu>("/imu/data", 1);
-			pubGripper = nh.advertise<data_msgs::Gripper>("/gripper/data", 1);
-			subGripper = nh.subscribe<data_msgs::Gripper>("/gripper/ctrl", 1, &RosOperator::gripperCtrlHandler, this, ros::TransportHints().tcpNoDelay());
+			// ros::NodeHandle nh("~");
+			pubImu = nh->advertise<sensor_msgs::Imu>("/imu/data", 1);
+			pubGripper = nh->advertise<data_msgs::Gripper>("/gripper/data", 1);
+			subGripper = nh->subscribe<data_msgs::Gripper>("/gripper/ctrl", 1, &RosOperator::gripperCtrlHandler, this, ros::TransportHints().tcpNoDelay());
 
-			pubGripperJointState = nh.advertise<sensor_msgs::JointState>("/gripper/joint_state", 1);
-			subJointStateCtrl = nh.subscribe<sensor_msgs::JointState>("/gripper/joint_state_ctrl", 1, &RosOperator::jointStateCtrlHandler, this, ros::TransportHints().tcpNoDelay());
+			pubGripperJointState = nh->advertise<sensor_msgs::JointState>("/gripper/joint_state", 1);
+			subJointStateCtrl = nh->subscribe<sensor_msgs::JointState>("/gripper/joint_state_ctrl", 1, &RosOperator::jointStateCtrlHandler, this, ros::TransportHints().tcpNoDelay());
 
-			subJointStateInfo = nh.subscribe<sensor_msgs::JointState>("/joint_state_info", 1, &RosOperator::jointStateInfoHandler, this, ros::TransportHints().tcpNoDelay());
-			pubArmJointStateWithGripper = nh.advertise<sensor_msgs::JointState>("/joint_state_gripper", 1);
+			subJointStateInfo = nh->subscribe<sensor_msgs::JointState>("/joint_state_info", 1, &RosOperator::jointStateInfoHandler, this, ros::TransportHints().tcpNoDelay());
+			pubArmJointStateWithGripper = nh->advertise<sensor_msgs::JointState>("/joint_state_gripper", 1);
 
-			subDataCaptureStatus = nh.subscribe<data_msgs::CaptureStatus>("/data_capture_status", 1, &RosOperator::dataCaptureStatusHandler, this, ros::TransportHints().tcpNoDelay());
-			subTeleopStatus = nh.subscribe<data_msgs::TeleopStatus>("/teleop_status", 1, &RosOperator::teleopStatusHandler, this, ros::TransportHints().tcpNoDelay());
-			subLocalizationStatus = nh.subscribe<data_msgs::LocalizationStatus>("/localization_status", 1, &RosOperator::localizationStatusHandler, this, ros::TransportHints().tcpNoDelay());
-			subArmControlStatus = nh.subscribe<data_msgs::ArmControlStatus>("/arm_control_status", 1, &RosOperator::armControlStatusHandler, this, ros::TransportHints().tcpNoDelay());
+			subDataCaptureStatus = nh->subscribe<data_msgs::CaptureStatus>("/data_capture_status", 1, &RosOperator::dataCaptureStatusHandler, this, ros::TransportHints().tcpNoDelay());
+			subTeleopStatus = nh->subscribe<data_msgs::TeleopStatus>("/teleop_status", 1, &RosOperator::teleopStatusHandler, this, ros::TransportHints().tcpNoDelay());
+			subLocalizationStatus = nh->subscribe<data_msgs::LocalizationStatus>("/localization_status", 1, &RosOperator::localizationStatusHandler, this, ros::TransportHints().tcpNoDelay());
+			subArmControlStatus = nh->subscribe<data_msgs::ArmControlStatus>("/arm_control_status", 1, &RosOperator::armControlStatusHandler, this, ros::TransportHints().tcpNoDelay());
 
-			client = nh.serviceClient<data_msgs::CaptureService>("/data_tools_dataCapture/capture_service");
-			client_arm_teleop = nh.serviceClient<std_srvs::Trigger>("/teleop_trigger");
+			client = nh->serviceClient<data_msgs::CaptureService>("/data_tools_dataCapture/capture_service");
+			client_arm_teleop = nh->serviceClient<std_srvs::Trigger>("/teleop_trigger");
 
 			receivingThread = new std::thread(&RosOperator::receiving, this);
 			if(!isGripper)
