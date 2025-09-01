@@ -41,7 +41,9 @@ def generate_launch_description():
 
     depth_camera_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('realsense2_camera'), 'launch', 'rs_launch.py')]),
-        launch_arguments={'depth_module.color_profile': camera_profile, 
+        launch_arguments={
+                          'rgb_camera.color_profile': camera_profile, 
+                          'depth_module.color_profile': camera_profile, 
                           'depth_module.depth_profile': camera_profile,
                           'depth_module.infra_profile': camera_profile}.items()
     )

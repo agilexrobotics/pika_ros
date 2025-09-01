@@ -56,6 +56,7 @@ def generate_launch_description():
         launch_arguments={'serial_no': sensor_depth_camera_no,
                           'camera_namespace': "sensor",
                           'camera_name': "camera",
+                          'rgb_camera.color_profile': camera_profile, 
                           'depth_module.color_profile': camera_profile, 
                           'depth_module.depth_profile': camera_profile,
                           'depth_module.infra_profile': camera_profile}.items()
@@ -65,6 +66,7 @@ def generate_launch_description():
         launch_arguments={'serial_no': gripper_depth_camera_no,
                           'camera_namespace': "gripper",
                           'camera_name': "camera",
+                          'rgb_camera.color_profile': camera_profile, 
                           'depth_module.color_profile': camera_profile, 
                           'depth_module.depth_profile': camera_profile,
                           'depth_module.infra_profile': camera_profile}.items()

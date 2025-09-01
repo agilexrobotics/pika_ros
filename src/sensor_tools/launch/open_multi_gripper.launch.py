@@ -90,6 +90,7 @@ def generate_launch_description():
         launch_arguments={'serial_no': l_depth_camera_no,
                           'camera_namespace': name,
                           'camera_name': "camera_l",
+                          'rgb_camera.color_profile': camera_profile, 
                           'depth_module.color_profile': camera_profile, 
                           'depth_module.depth_profile': camera_profile,
                           'depth_module.infra_profile': camera_profile}.items()
@@ -99,6 +100,7 @@ def generate_launch_description():
         launch_arguments={'serial_no': r_depth_camera_no,
                           'camera_namespace': name,
                           'camera_name': "camera_r",
+                          'rgb_camera.color_profile': camera_profile, 
                           'depth_module.color_profile': camera_profile, 
                           'depth_module.depth_profile': camera_profile,
                           'depth_module.infra_profile': camera_profile}.items()
