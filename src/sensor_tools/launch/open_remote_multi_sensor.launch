@@ -1,0 +1,43 @@
+<launch>
+    <arg name="name" default="" />
+    <arg name="name_index" default="" />
+    <arg name="l_serial_port" default="/dev/ttyUSB50" />
+    <arg name="r_serial_port" default="/dev/ttyUSB51" />
+    <arg name="l_joint_name" default="$(arg name_index)gripper_l_center_joint" />
+    <arg name="r_joint_name" default="$(arg name_index)gripper_r_center_joint" />
+
+	<node pkg="sensor_tools" name="$(arg name_index)serial_gripper_imu_l" type="serial_gripper_imu" output="screen" respawn="true">
+	    <param name="serial_port" value="$(arg l_serial_port)"/>
+        <param name="joint_name" value="$(arg l_joint_name)"/>
+        <remap from="/imu/data" to="$(arg name)/imu_l/data"/>
+        <remap from="/gripper/data" to="$(arg name)/gripper_l/data"/>
+        <remap from="/gripper/ctrl" to="$(arg name)/gripper_l/ctrl"/>
+        <remap from="/gripper/joint_state" to="$(arg name)/gripper_l/joint_state"/>
+        <remap from="/gripper/joint_state_ctrl" to="$(arg name)/joint_states_l"/>
+        <remap from="/joint_state_info" to="/joint_states_l"/>
+        <remap from="/joint_state_gripper" to="/joint_states_gripper_l"/>
+        <remap from="/teleop_trigger" to="/teleop_trigger_l"/>
+        <remap from="/data_capture_status" to="/data_tools_dataCapture/status"/>
+        <remap from="/teleop_status" to="/teleop_status_l"/>
+        <remap from="/localization_status" to="/pika_localization_status_l"/>
+        <remap from="/arm_control_status" to="/arm_control_status_l"/>
+	</node>
+	<node pkg="sensor_tools" name="$(arg name_index)serial_gripper_imu_r" type="serial_gripper_imu" output="screen" respawn="true">
+	    <param name="serial_port" value="$(arg r_serial_port)"/>
+        <param name="joint_name" value="$(arg r_joint_name)"/>
+        <remap from="/imu/data" to="$(arg name)/imu_r/data"/>
+        <remap from="/gripper/data" to="$(arg name)/gripper_r/data"/>
+        <remap from="/gripper/ctrl" to="$(arg name)/gripper_r/ctrl"/>
+        <remap from="/gripper/joint_state" to="$(arg name)/gripper_r/joint_state"/>
+        <remap from="/gripper/joint_state_ctrl" to="$(arg name)/joint_states_r"/>
+        <remap from="/joint_state_info" to="/joint_states_r"/>
+        <remap from="/joint_state_gripper" to="/joint_states_gripper_r"/>
+        <remap from="/teleop_trigger" to="/teleop_trigger_r"/>
+        <remap from="/data_capture_status" to="/data_tools_dataCapture/status"/>
+        <remap from="/teleop_status" to="/teleop_status_l"/>
+        <remap from="/localization_status" to="/pika_localization_status_l"/>
+        <remap from="/arm_control_status" to="/arm_control_status_l"/>
+	</node>
+    <include file="$(find pika_locator)/launch/pika_double_locator.launch"/>
+</launch>
+
