@@ -4,12 +4,8 @@
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
 <robot
   name="piper">
+
   <link name="dummy_link"/>
-  <joint name="base_to_dummy" type="fixed">
-    <parent link="dummy_link"/>
-    <child link="base_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-  </joint>
 
   <link
     name="base_link">
@@ -52,6 +48,13 @@
     </collision>
   </link>
   
+  <joint name="base_to_dummy" type="fixed">
+    <parent link="dummy_link"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+
   <link
     name="link1">
     <inertial>
@@ -424,7 +427,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://piper_description/meshes/gripper_base_link.STL" />
+          filename="package://pika_gripper_description/meshes/gripper_base_link.STL" />
       </geometry>
       <material
         name="">
@@ -438,7 +441,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://piper_description/meshes/gripper_base_link.STL" />
+          filename="package://pika_gripper_description/meshes/gripper_base_link.STL" />
       </geometry>
     </collision>
   </link> 
@@ -475,7 +478,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://piper_description/meshes/gripper_left_link.STL" />
+          filename="package://pika_gripper_description/meshes/gripper_left_link.STL" />
       </geometry>
       <material
         name="">
@@ -489,7 +492,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://piper_description/meshes/gripper_left_link.STL" />
+          filename="package://pika_gripper_description/meshes/gripper_left_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -533,7 +536,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://piper_description/meshes/gripper_right_link.STL" />
+          filename="package://pika_gripper_description/meshes/gripper_right_link.STL" />
       </geometry>
       <material
         name="">
@@ -547,7 +550,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://piper_description/meshes/gripper_right_link.STL" />
+          filename="package://pika_gripper_description/meshes/gripper_right_link.STL" />
       </geometry>
     </collision>
   </link>
