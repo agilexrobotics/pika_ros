@@ -292,6 +292,11 @@ class RosOperator{
 			receivingThread = new std::thread(&RosOperator::receiving, this);
 			if(!isGripper)
 				statusSendingThread = new std::thread(&RosOperator::statusSending, this);
+			std::vector<uint8_t> command = createBinaryCommand<float>(EFFORT_CTRL, std::vector<float>{static_cast<float>(motorCurrentLimit)});
+			std::lock_guard<std::mutex> serialLock(serialMtx);
+			if(serial && serial->is_open()){
+				boost::asio::write(*serial, boost::asio::buffer(command));
+			}
 			return true;
 		} catch (boost::system::system_error& e) {
 			ROS_ERROR("Failed to open serial port: %s", e.what());
@@ -445,12 +450,12 @@ class RosOperator{
 		float motorCurrent = this->motorCurrent;
 		float motorAngle = this->angle;
 		receiveDataMtx.unlock();
-		if(fabs(motorCurrent) > motorCurrentLimit && motorCurrentLimit > 0){
-			if(motorCurrent < 0 && angle < motorAngle)
-				return;
-			if(motorCurrent > 0 && angle > motorAngle)
-				return;
-		}
+		// if(fabs(motorCurrent) > motorCurrentLimit && motorCurrentLimit > 0){
+		// 	if(motorCurrent < 0 && angle < motorAngle)
+		// 		return;
+		// 	if(motorCurrent > 0 && angle > motorAngle)
+		// 		return;
+		// }
 		std::vector<uint8_t> command = createBinaryCommand<float>(mitMode?POSITION_CTRL_MIT:POSITION_CTRL_POS_VEL, std::vector<float>{angle});
 		std::lock_guard<std::mutex> lock(serialMtx);
 		if(serial && serial->is_open()){
@@ -532,12 +537,12 @@ class RosOperator{
 			float motorCurrent = this->motorCurrent;
 			float motorAngle = this->angle;
 			receiveDataMtx.unlock();
-			if(fabs(motorCurrent) > motorCurrentLimit && motorCurrentLimit > 0){
-				if(motorCurrent < 0 && angle < motorAngle)
-					return;
-				if(motorCurrent > 0 && angle > motorAngle)
-					return;
-			}
+			// if(fabs(motorCurrent) > motorCurrentLimit && motorCurrentLimit > 0){
+			// 	if(motorCurrent < 0 && angle < motorAngle)
+			// 		return;
+			// 	if(motorCurrent > 0 && angle > motorAngle)
+			// 		return;
+			// }
 			std::vector<uint8_t> command = createBinaryCommand<float>(mitMode?POSITION_CTRL_MIT:POSITION_CTRL_POS_VEL, std::vector<float>{angle});
 			std::lock_guard<std::mutex> lock(serialMtx);
 			if(serial && serial->is_open()){
@@ -767,21 +772,21 @@ class RosOperator{
 							jointState.position[0] = gripper.distance;  // 0.77 - gripper.angle / 1.67 * (0.77 + 0.10);
 							pubGripperJointState.publish(jointState);
 
-							if(fabs(gripper.effort) > motorCurrentLimit + motorCurrentRedundancy && motorCurrentLimit > 0){
-								float step = 0;
-								if(gripper.effort < 0)
-									step = 0.01;
-								if(gripper.effort > 0)
-									step = -0.01;
-								std::vector<uint8_t> command = createBinaryCommand<float>(mitMode?POSITION_CTRL_MIT:POSITION_CTRL_POS_VEL, std::vector<float>{gripper.angle+step});
-								std::lock_guard<std::mutex> lock(serialMtx);
-								if(!((step > 0 && lastCommandAngle > gripper.angle+step) || (step < 0 && lastCommandAngle < gripper.angle+step))){
-									if(serial && serial->is_open()){
-										boost::asio::write(*serial, boost::asio::buffer(command));
-										lastCommandAngle = angle;
-									}
-								}
-							}
+							// if(fabs(gripper.effort) > motorCurrentLimit + motorCurrentRedundancy && motorCurrentLimit > 0){
+							// 	float step = 0;
+							// 	if(gripper.effort < 0)
+							// 		step = 0.01;
+							// 	if(gripper.effort > 0)
+							// 		step = -0.01;
+							// 	std::vector<uint8_t> command = createBinaryCommand<float>(mitMode?POSITION_CTRL_MIT:POSITION_CTRL_POS_VEL, std::vector<float>{gripper.angle+step});
+							// 	std::lock_guard<std::mutex> lock(serialMtx);
+							// 	if(!((step > 0 && lastCommandAngle > gripper.angle+step) || (step < 0 && lastCommandAngle < gripper.angle+step))){
+							// 		if(serial && serial->is_open()){
+							// 			boost::asio::write(*serial, boost::asio::buffer(command));
+							// 			lastCommandAngle = angle;
+							// 		}
+							// 	}
+							// }
 						}
 						if(root.isMember("motorstatus")){
 							Json::Value motorstatusValue = root["motorstatus"];
