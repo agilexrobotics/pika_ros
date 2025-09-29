@@ -276,6 +276,7 @@ class RosOperator: public rclcpp::Node{
 
 			statusSendingThread = new std::thread(&RosOperator::statusSending, this);
 			receivingThread = new std::thread(&RosOperator::receiving, this);
+			motorCurrentLimit = motorCurrentLimit/1000;
 			std::vector<uint8_t> command = createBinaryCommand<float>(EFFORT_CTRL, std::vector<float>{static_cast<float>(motorCurrentLimit)});
 			std::lock_guard<std::mutex> serialLock(serialMtx);
 			if(serial && serial->is_open()){
@@ -289,7 +290,8 @@ class RosOperator: public rclcpp::Node{
 	}
 
 	void statusSending(){
-		rclcpp::Rate rate(10);
+		rclcpp::Rate rate1(50);
+		rclcpp::Rate rate2(100);
 		int lastColorStatus = -1;
 		double lastColorStatusTime = -1;
 		while(rclcpp::ok()){
@@ -326,7 +328,7 @@ class RosOperator: public rclcpp::Node{
 					boost::asio::write(*serial, boost::asio::buffer(command));
 				}
 			}
-			
+			rate2.sleep();
 			// 处理振动状态
 			{
 				int nowVibrateStatus = VIBRATE_NONE;
@@ -346,7 +348,7 @@ class RosOperator: public rclcpp::Node{
 					}
 				}
 			}
-			rate.sleep();
+			rate1.sleep();
 		}
 	}
 
