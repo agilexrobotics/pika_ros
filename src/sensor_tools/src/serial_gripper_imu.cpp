@@ -292,6 +292,7 @@ class RosOperator{
 			receivingThread = new std::thread(&RosOperator::receiving, this);
 			if(!isGripper)
 				statusSendingThread = new std::thread(&RosOperator::statusSending, this);
+			motorCurrentLimit = motorCurrentLimit/1000;
 			std::vector<uint8_t> command = createBinaryCommand<float>(EFFORT_CTRL, std::vector<float>{static_cast<float>(motorCurrentLimit)});
 			std::lock_guard<std::mutex> serialLock(serialMtx);
 			if(serial && serial->is_open()){
@@ -305,7 +306,8 @@ class RosOperator{
 	}
 
 	void statusSending(){
-		ros::Rate rate(10);
+		ros::Rate rate1(50);
+		ros::Rate rate2(100);
 		int lastColorStatus = -1;
 		double lastColorStatusTime = -1;
 		while(ros::ok()){
@@ -341,7 +343,7 @@ class RosOperator{
 					boost::asio::write(*serial, boost::asio::buffer(command));
 				}
 			}
-			
+			rate2.sleep();
 			// 处理振动状态
 			{
 				int nowVibrateStatus = VIBRATE_NONE;
@@ -361,7 +363,7 @@ class RosOperator{
 					}
 				}
 			}
-			rate.sleep();
+			rate1.sleep();
 		}
 	}
 
