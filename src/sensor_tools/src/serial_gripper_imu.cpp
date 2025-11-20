@@ -88,6 +88,7 @@ bool find_json(std::string &msg, int &start, int &end){
 class RosOperator: public rclcpp::Node{
 	public:
 	bool isGripper = false;
+	bool isHelmet = false;
 
 	std::string msg;
 	std::string serialPort;
@@ -191,6 +192,8 @@ class RosOperator: public rclcpp::Node{
 		ctrlFreq = 1.0/ctrlRate;
 		if(serialPort == "/dev/ttyUSB60" || serialPort == "/dev/ttyUSB61")
 			isGripper = true;
+		if(serialPort == "/dev/ttyUSB70")
+			isHelmet = true;
         char resolvedPath[PATH_MAX];
         int ret = readlink(serialPort.c_str(), resolvedPath, sizeof(resolvedPath));
 		if(ret >= 0){
@@ -259,20 +262,25 @@ class RosOperator: public rclcpp::Node{
 			serial->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
 			serial->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
 			
-			pubGripper = create_publisher<data_msgs::msg::Gripper>("/gripper/data", 1);
-			subGripper = this->create_subscription<data_msgs::msg::Gripper>("gripper/ctrl", 1, std::bind(&RosOperator::gripperCtrlHandler, this, std::placeholders::_1));
-			pubImu = create_publisher<sensor_msgs::msg::Imu>("/imu/data", 1);
-			pubGripperJointState = create_publisher<sensor_msgs::msg::JointState>("/gripper/joint_state", 1);
-			subJointStateCtrl = this->create_subscription<sensor_msgs::msg::JointState>("/gripper/joint_state_ctrl", 1, std::bind(&RosOperator::jointStateCtrlHandler, this, std::placeholders::_1));
-			subJointStateInfo = this->create_subscription<sensor_msgs::msg::JointState>("/joint_state_info", 1, std::bind(&RosOperator::jointStateInfoHandler, this, std::placeholders::_1));
-			pubArmJointStateWithGripper = create_publisher<sensor_msgs::msg::JointState>("/joint_state_gripper", 1);
-			subDataCaptureStatus = this->create_subscription<data_msgs::msg::CaptureStatus>("/data_capture_status", 1, std::bind(&RosOperator::dataCaptureStatusHandler, this, std::placeholders::_1));
-			subTeleopStatus = this->create_subscription<data_msgs::msg::TeleopStatus>("/teleop_status", 1, std::bind(&RosOperator::teleopStatusHandler, this, std::placeholders::_1));
-			subLocalizationStatus = this->create_subscription<data_msgs::msg::LocalizationStatus>("/localization_status", 1, std::bind(&RosOperator::localizationStatusHandler, this, std::placeholders::_1));
-			subArmControlStatus = this->create_subscription<data_msgs::msg::ArmControlStatus>("/arm_control_status", 1, std::bind(&RosOperator::armControlStatusHandler, this, std::placeholders::_1));
+			if (isHelmet){
+				pubImu = create_publisher<sensor_msgs::msg::Imu>("/imu/data", 1);
+			}else{
+				pubGripper = create_publisher<data_msgs::msg::Gripper>("/gripper/data", 1);
+				subGripper = this->create_subscription<data_msgs::msg::Gripper>("gripper/ctrl", 1, std::bind(&RosOperator::gripperCtrlHandler, this, std::placeholders::_1));
+				
+				pubGripperJointState = create_publisher<sensor_msgs::msg::JointState>("/gripper/joint_state", 1);
+				subJointStateCtrl = this->create_subscription<sensor_msgs::msg::JointState>("/gripper/joint_state_ctrl", 1, std::bind(&RosOperator::jointStateCtrlHandler, this, std::placeholders::_1));
+				subJointStateInfo = this->create_subscription<sensor_msgs::msg::JointState>("/joint_state_info", 1, std::bind(&RosOperator::jointStateInfoHandler, this, std::placeholders::_1));
+				pubArmJointStateWithGripper = create_publisher<sensor_msgs::msg::JointState>("/joint_state_gripper", 1);
+				subDataCaptureStatus = this->create_subscription<data_msgs::msg::CaptureStatus>("/data_capture_status", 1, std::bind(&RosOperator::dataCaptureStatusHandler, this, std::placeholders::_1));
+				subTeleopStatus = this->create_subscription<data_msgs::msg::TeleopStatus>("/teleop_status", 1, std::bind(&RosOperator::teleopStatusHandler, this, std::placeholders::_1));
+				subLocalizationStatus = this->create_subscription<data_msgs::msg::LocalizationStatus>("/localization_status", 1, std::bind(&RosOperator::localizationStatusHandler, this, std::placeholders::_1));
+				subArmControlStatus = this->create_subscription<data_msgs::msg::ArmControlStatus>("/arm_control_status", 1, std::bind(&RosOperator::armControlStatusHandler, this, std::placeholders::_1));
 
-			client = this->create_client<data_msgs::srv::CaptureService>("/data_tools_dataCapture/capture_service");
-			teleopClient = this->create_client<std_srvs::srv::Trigger>("/teleop_trigger");
+				client = this->create_client<data_msgs::srv::CaptureService>("/data_tools_dataCapture/capture_service");
+				teleopClient = this->create_client<std_srvs::srv::Trigger>("/teleop_trigger");
+			}
+
 
 			statusSendingThread = new std::thread(&RosOperator::statusSending, this);
 			receivingThread = new std::thread(&RosOperator::receiving, this);
@@ -670,6 +678,27 @@ class RosOperator: public rclcpp::Node{
 					Json::Value root;
 					try{
 						jsonReader.parse(str, root);
+						if(isHelmet){
+							if(root.isMember("IMU")){
+								sensor_msgs::msg::Imu imu;
+								imu.header.stamp = time;
+								Json::Value IMUValue = root["IMU"];
+								imu.header.stamp = time;
+								tf2::Quaternion quat_tf;
+								quat_tf.setRPY(IMUValue["roll"].asDouble(), IMUValue["pitch"].asDouble(), IMUValue["yaw"].asDouble());
+								geometry_msgs::msg::Quaternion quat_msg;
+								tf2::convert(quat_tf, quat_msg);
+								imu.orientation = quat_msg;
+								imu.angular_velocity.x = IMUValue["gyr"][0].asDouble();
+								imu.angular_velocity.y = IMUValue["gyr"][1].asDouble();
+								imu.angular_velocity.z = IMUValue["gyr"][2].asDouble();
+								imu.linear_acceleration.x = IMUValue["acc"][0].asDouble();
+								imu.linear_acceleration.y = IMUValue["acc"][1].asDouble();
+								imu.linear_acceleration.z = IMUValue["acc"][2].asDouble();
+								pubImu->publish(imu);
+							}
+							continue;
+						}
 						if(root.isMember("AS5047")){
 							data_msgs::msg::Gripper gripper;
 							gripper.header.stamp = time;
@@ -702,24 +731,6 @@ class RosOperator: public rclcpp::Node{
 								jointState.position[0] = gripper.distance;  // 0.77 - gripper.angle / 1.67 * (0.77 + 0.10);
 								pubGripperJointState->publish(jointState);
 							}
-						}
-						if(root.isMember("IMU")){
-							sensor_msgs::msg::Imu imu;
-							imu.header.stamp = time;
-							Json::Value IMUValue = root["IMU"];
-							imu.header.stamp = time;
-							tf2::Quaternion quat_tf;
-							quat_tf.setRPY(IMUValue["roll"].asDouble(), IMUValue["pitch"].asDouble(), IMUValue["yaw"].asDouble());
-							geometry_msgs::msg::Quaternion quat_msg;
-							tf2::convert(quat_tf, quat_msg);
-							imu.orientation = quat_msg;
-							imu.angular_velocity.x = IMUValue["gyr"][0].asDouble();
-							imu.angular_velocity.y = IMUValue["gyr"][1].asDouble();
-							imu.angular_velocity.z = IMUValue["gyr"][2].asDouble();
-							imu.linear_acceleration.x = IMUValue["acc"][0].asDouble();
-							imu.linear_acceleration.y = IMUValue["acc"][1].asDouble();
-							imu.linear_acceleration.z = IMUValue["acc"][2].asDouble();
-							pubImu->publish(imu);
 						}
 						if(root.isMember("motor")){
 							data_msgs::msg::Gripper gripper;
