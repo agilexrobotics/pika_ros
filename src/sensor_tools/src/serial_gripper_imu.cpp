@@ -726,7 +726,23 @@ class RosOperator{
 							sensor_msgs::Imu imu;
 							imu.header.stamp = time;
 							Json::Value IMUValue = root["IMU"];
-							imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(IMUValue["roll"].asDouble(), IMUValue["pitch"].asDouble(), IMUValue["yaw"].asDouble());
+							// 如果IMUValue["quat"]字段存在且有效，可以使用四元数直接赋值
+							if (IMUValue["quat"].isArray())
+							{
+								imu.orientation.w = IMUValue["quat"][0].asDouble();
+								imu.orientation.x = IMUValue["quat"][1].asDouble();
+								imu.orientation.y = IMUValue["quat"][2].asDouble();
+								imu.orientation.z = IMUValue["quat"][3].asDouble();
+							}
+							else
+							{
+								// 否则，使用欧拉角转换为四元数
+								imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(
+									IMUValue["roll"].asDouble(),
+									IMUValue["pitch"].asDouble(),
+									IMUValue["yaw"].asDouble()
+								);
+							}							
 							imu.angular_velocity.x = IMUValue["gyr"][0].asDouble();
 							imu.angular_velocity.y = IMUValue["gyr"][1].asDouble();
 							imu.angular_velocity.z = IMUValue["gyr"][2].asDouble();
