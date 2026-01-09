@@ -1,0 +1,28 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from piper_msgs/msg/PosCmd.msg
+// generated code does not contain a copyright notice
+
+
+module piper_msgs {
+  module msg {
+    struct PosCmd {
+      double x;
+
+      double y;
+
+      double z;
+
+      double roll;
+
+      double pitch;
+
+      double yaw;
+
+      double gripper;
+
+      int32 mode1;
+
+      int32 mode2;
+    };
+  };
+};

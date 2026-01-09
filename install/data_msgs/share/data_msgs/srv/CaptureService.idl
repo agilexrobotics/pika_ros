@@ -1,0 +1,25 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from data_msgs/srv/CaptureService.srv
+// generated code does not contain a copyright notice
+
+
+module data_msgs {
+  module srv {
+    struct CaptureService_Request {
+      boolean start;
+
+      boolean end;
+
+      int32 episode_index;
+
+      string dataset_dir;
+
+      string instructions;
+    };
+    struct CaptureService_Response {
+      boolean success;
+
+      string message;
+    };
+  };
+};

@@ -1,0 +1,12 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from data_msgs/msg/ArmControlStatus.msg
+// generated code does not contain a copyright notice
+
+
+module data_msgs {
+  module msg {
+    struct ArmControlStatus {
+      boolean over_limit;
+    };
+  };
+};

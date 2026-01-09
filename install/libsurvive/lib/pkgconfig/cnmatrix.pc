@@ -1,0 +1,10 @@
+prefix=/home/agilex/pika_ros/install/libsurvive
+exec_prefix=/home/agilex/pika_ros/install/libsurvive
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/cnmatrix
+
+Name: libsurvive
+Description: Cnmatrix
+Version: 0
+Libs: -L${libdir} -lcnmatrix 
+Cflags: -I${includedir} -I${includedir}/redist

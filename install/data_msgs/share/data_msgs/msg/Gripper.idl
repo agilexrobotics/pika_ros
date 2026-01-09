@@ -1,0 +1,37 @@
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from data_msgs/msg/Gripper.msg
+// generated code does not contain a copyright notice
+
+#include "std_msgs/msg/Header.idl"
+
+module data_msgs {
+  module msg {
+    struct Gripper {
+      std_msgs::msg::Header header;
+
+      double angle;
+
+      double distance;
+
+      double effort;
+
+      double velocity;
+
+      boolean enable;
+
+      boolean set_zero;
+
+      boolean error;
+
+      double voltage;
+
+      double driver_temp;
+
+      double motor_temp;
+
+      double bus_current;
+
+      string status;
+    };
+  };
+};

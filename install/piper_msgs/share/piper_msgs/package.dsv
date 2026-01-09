@@ -1,0 +1,11 @@
+source;share/piper_msgs/hook/cmake_prefix_path.ps1
+source;share/piper_msgs/hook/cmake_prefix_path.dsv
+source;share/piper_msgs/hook/cmake_prefix_path.sh
+source;share/piper_msgs/hook/ld_library_path_lib.ps1
+source;share/piper_msgs/hook/ld_library_path_lib.dsv
+source;share/piper_msgs/hook/ld_library_path_lib.sh
+source;share/piper_msgs/local_setup.bash
+source;share/piper_msgs/local_setup.dsv
+source;share/piper_msgs/local_setup.ps1
+source;share/piper_msgs/local_setup.sh
+source;share/piper_msgs/local_setup.zsh

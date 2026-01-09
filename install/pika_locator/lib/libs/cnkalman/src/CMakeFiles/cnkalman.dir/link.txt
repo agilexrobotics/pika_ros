@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcnkalman.a CMakeFiles/cnkalman.dir/kalman.c.o CMakeFiles/cnkalman.dir/model.cc.o CMakeFiles/cnkalman.dir/numerical_diff.c.o CMakeFiles/cnkalman.dir/iekf.c.o CMakeFiles/cnkalman.dir/ModelPlot.cc.o
+/usr/bin/ranlib libcnkalman.a

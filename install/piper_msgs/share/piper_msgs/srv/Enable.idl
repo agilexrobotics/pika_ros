@@ -1,0 +1,19 @@
+// generated from rosidl_adapter/resource/srv.idl.em
+// with input from piper_msgs/srv/Enable.srv
+// generated code does not contain a copyright notice
+
+
+module piper_msgs {
+  module srv {
+    struct Enable_Request {
+      @verbatim (language="comment", text=
+        "请求消息类型为bool")
+      boolean enable_request;
+    };
+    struct Enable_Response {
+      @verbatim (language="comment", text=
+        "响应消息类型为bool")
+      boolean enable_response;
+    };
+  };
+};

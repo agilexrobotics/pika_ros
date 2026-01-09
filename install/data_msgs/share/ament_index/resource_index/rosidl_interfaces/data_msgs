@@ -1,0 +1,14 @@
+msg/ArmControlStatus.idl
+msg/ArmControlStatus.msg
+msg/CaptureStatus.idl
+msg/CaptureStatus.msg
+msg/Gripper.idl
+msg/Gripper.msg
+msg/LocalizationStatus.idl
+msg/LocalizationStatus.msg
+msg/TeleopStatus.idl
+msg/TeleopStatus.msg
+srv/CaptureService.idl
+srv/CaptureService.srv
+srv/CaptureService_Request.msg
+srv/CaptureService_Response.msg

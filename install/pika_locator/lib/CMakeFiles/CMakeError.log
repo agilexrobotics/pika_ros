@@ -1,0 +1,76 @@
+Determining if the include file gattlib.h exists failed with the following output:
+Change Dir: /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_03a21/fast && gmake[1]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+/usr/bin/gmake  -f CMakeFiles/cmTC_03a21.dir/build.make CMakeFiles/cmTC_03a21.dir/build
+gmake[2]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_03a21.dir/CheckIncludeFile.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_03a21.dir/CheckIncludeFile.c.o -c /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: gattlib.h: No such file or directory
+    1 | #include <gattlib.h>
+      |          ^~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/cmTC_03a21.dir/build.make:78: CMakeFiles/cmTC_03a21.dir/CheckIncludeFile.c.o] Error 1
+gmake[2]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+gmake[1]: *** [Makefile:127: cmTC_03a21/fast] Error 2
+gmake[1]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file lapacke/lapacke.h exists failed with the following output:
+Change Dir: /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f2070/fast && gmake[1]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+/usr/bin/gmake  -f CMakeFiles/cmTC_f2070.dir/build.make CMakeFiles/cmTC_f2070.dir/build
+gmake[2]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f2070.dir/CheckIncludeFile.c.o
+/usr/bin/cc   -fPIC -Wall -Wno-unused-variable -Wno-switch -Wno-parentheses -Wno-missing-braces -Werror=return-type -fvisibility=hidden -Werror=vla -fno-math-errno -Werror=pointer-arith -std=gnu99 -Werror=incompatible-pointer-types -Werror=implicit-function-declaration -Werror=missing-field-initializers  -fPIC -Wall -Wno-unused-variable -Wno-switch -Wno-parentheses -Wno-missing-braces -Werror=return-type -fvisibility=hidden -Werror=vla -fno-math-errno -Werror=pointer-arith -std=gnu99 -Werror=incompatible-pointer-types -Werror=implicit-function-declaration -Werror=missing-field-initializers  -fPIC -Wall -Wno-unused-variable -Wno-switch -Wno-parentheses -Wno-missing-braces -Werror=return-type -fvisibility=hidden -Werror=vla -fno-math-errno -Werror=missing-field-initializers -Werror=pointer-arith -std=gnu99 -Werror=incompatible-pointer-types -Werror=implicit-function-declaration   -o CMakeFiles/cmTC_f2070.dir/CheckIncludeFile.c.o -c /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: lapacke/lapacke.h: No such file or directory
+    1 | #include <lapacke/lapacke.h>
+      |          ^~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/cmTC_f2070.dir/build.make:78: CMakeFiles/cmTC_f2070.dir/CheckIncludeFile.c.o] Error 1
+gmake[2]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+gmake[1]: *** [Makefile:127: cmTC_f2070/fast] Error 2
+gmake[1]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file libusb.h exists failed with the following output:
+Change Dir: /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a9c2e/fast && gmake[1]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+/usr/bin/gmake  -f CMakeFiles/cmTC_a9c2e.dir/build.make CMakeFiles/cmTC_a9c2e.dir/build
+gmake[2]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a9c2e.dir/CheckIncludeFile.c.o
+/usr/bin/cc -D_GNU_SOURCE  -fPIC -Wall -Wno-unused-variable -Wno-switch -Wno-parentheses -Wno-missing-braces -Werror=return-type -fvisibility=hidden -Werror=vla -fno-math-errno -Werror=pointer-arith -std=gnu99 -Werror=incompatible-pointer-types -Werror=implicit-function-declaration -Werror=missing-field-initializers   -o CMakeFiles/cmTC_a9c2e.dir/CheckIncludeFile.c.o -c /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: libusb.h: No such file or directory
+    1 | #include <libusb.h>
+      |          ^~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/cmTC_a9c2e.dir/build.make:78: CMakeFiles/cmTC_a9c2e.dir/CheckIncludeFile.c.o] Error 1
+gmake[2]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+gmake[1]: *** [Makefile:127: cmTC_a9c2e/fast] Error 2
+gmake[1]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file libusb/libusb.h exists failed with the following output:
+Change Dir: /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_eec53/fast && gmake[1]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+/usr/bin/gmake  -f CMakeFiles/cmTC_eec53.dir/build.make CMakeFiles/cmTC_eec53.dir/build
+gmake[2]: Entering directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_eec53.dir/CheckIncludeFile.c.o
+/usr/bin/cc -D_GNU_SOURCE  -fPIC -Wall -Wno-unused-variable -Wno-switch -Wno-parentheses -Wno-missing-braces -Werror=return-type -fvisibility=hidden -Werror=vla -fno-math-errno -Werror=pointer-arith -std=gnu99 -Werror=incompatible-pointer-types -Werror=implicit-function-declaration -Werror=missing-field-initializers   -o CMakeFiles/cmTC_eec53.dir/CheckIncludeFile.c.o -c /home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c
+/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp/CheckIncludeFile.c:1:10: fatal error: libusb/libusb.h: No such file or directory
+    1 | #include <libusb/libusb.h>
+      |          ^~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [CMakeFiles/cmTC_eec53.dir/build.make:78: CMakeFiles/cmTC_eec53.dir/CheckIncludeFile.c.o] Error 1
+gmake[2]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+gmake[1]: *** [Makefile:127: cmTC_eec53/fast] Error 2
+gmake[1]: Leaving directory '/home/agilex/pika_ros/src/pika_locator/libsurvive/bin/CMakeFiles/CMakeTmp'
+
+
+

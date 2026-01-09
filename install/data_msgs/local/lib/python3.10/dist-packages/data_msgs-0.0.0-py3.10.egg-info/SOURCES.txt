@@ -1,0 +1,14 @@
+setup.py
+data_msgs/__init__.py
+data_msgs.egg-info/PKG-INFO
+data_msgs.egg-info/SOURCES.txt
+data_msgs.egg-info/dependency_links.txt
+data_msgs.egg-info/top_level.txt
+data_msgs/msg/__init__.py
+data_msgs/msg/_arm_control_status.py
+data_msgs/msg/_capture_status.py
+data_msgs/msg/_gripper.py
+data_msgs/msg/_localization_status.py
+data_msgs/msg/_teleop_status.py
+data_msgs/srv/__init__.py
+data_msgs/srv/_capture_service.py

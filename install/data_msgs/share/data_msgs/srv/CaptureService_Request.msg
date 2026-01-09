@@ -1,0 +1,5 @@
+bool start
+bool end
+int32 episode_index
+string dataset_dir
+string instructions

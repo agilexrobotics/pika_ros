@@ -1,0 +1,74 @@
+/**:
+  ros__parameters:
+    dataInfo:
+
+      camera:
+        color:
+          names: ['pikaDepthCamera_l', 'pikaDepthCamera_r', 'pikaFisheyeCamera_l', 'pikaFisheyeCamera_r']
+          parentFrames: ['camera_l_link', 'camera_r_link', 'camera_fisheye_l_link', 'camera_fisheye_r_link']
+          topics: ['/camera_l/color/image_raw', '/camera_r/color/image_raw', '/camera_fisheye_l/color/image_raw', '/camera_fisheye_r/color/image_raw']
+          configTopics: ['/camera_l/color/camera_info', '/camera_r/color/camera_info', '/camera_fisheye_l/color/camera_info', '/camera_fisheye_r/color/camera_info']
+        depth:
+          names: ['pikaDepthCamera_l', 'pikaDepthCamera_r']
+          parentFrames: ['camera_l_link', 'camera_r_link']
+          topics: ['/camera_l/aligned_depth_to_color/image_raw', '/camera_r/aligned_depth_to_color/image_raw']
+          configTopics: ['/camera_l/aligned_depth_to_color/camera_info', '/camera_r/aligned_depth_to_color/camera_info']
+        # pointCloud:
+        #   names: []
+        #   parentFrames: []
+        #   topics: []
+        #   configTopics: []
+        #   maxDistances: []
+        #   downSizes: []
+
+      # arm:
+      #   jointState:
+      #     names: []
+      #     topics: []
+      #   endPose:
+      #     names: []
+      #     topics: []
+      #     orients: []
+
+      localization:
+        pose:
+          names: ['pika_l', 'pika_r']
+          topics: ['/pika_pose_l', '/pika_pose_r']
+
+      gripper:
+        encoder:
+          names: ['pika_l', 'pika_r']
+          topics: ['/gripper_l/data', '/gripper_r/data']
+
+#      imu:
+#        9axis:
+#          names: []
+#          topics: []
+
+      # lidar:
+      #   pointCloud:
+      #     names: []
+      #     topics: []
+      #     xDistanceUppers: []
+      #     xDistanceLowers: []
+      #     yDistanceUppers: []
+      #     yDistanceLowers: []
+      #     zDistanceUppers: []
+      #     zDistanceLowers: []
+      #     downSizes: []
+
+      # robotBase:
+      #   vel:
+      #     names: []
+      #     topics: []
+
+      # lift:
+      #   motor:
+      #     names: []
+      #     topics: []
+      #     pubTopics: []
+
+      # tf:
+      #   transform:
+      #     parentFrames: []
+      #     childFrames: []

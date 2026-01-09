@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcnmatrix.a CMakeFiles/cnmatrix.dir/cn_matrix.c.o CMakeFiles/cnmatrix.dir/eigen/core.cpp.o CMakeFiles/cnmatrix.dir/eigen/gemm.cpp.o CMakeFiles/cnmatrix.dir/eigen/svd.cpp.o
+/usr/bin/ranlib libcnmatrix.a

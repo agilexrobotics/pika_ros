@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCNGFX.a CMakeFiles/CNGFX.dir/CNFG3D.c.o CMakeFiles/CNGFX.dir/CNFGFunctions.c.o CMakeFiles/CNGFX.dir/CNFGXDriver.c.o
+/usr/bin/ranlib libCNGFX.a

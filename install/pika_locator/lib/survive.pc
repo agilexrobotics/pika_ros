@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=/usr/local
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libsurvive
+Description: Libsurvive
+Version: 0
+Libs: -L${libdir} -lsurvive 
+Cflags: -I${includedir} -I${includedir}/libsurvive -I${includedir}/libsurvive/redist

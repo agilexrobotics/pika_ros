@@ -1,0 +1,10 @@
+prefix=/home/agilex/pika_ros/install/libsurvive
+exec_prefix=/home/agilex/pika_ros/install/libsurvive
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/cnkalman
+
+Name: libsurvive
+Description: A C and C++ extended kalman filter library
+Version: 0
+Libs: -L${libdir} -lcnkalman 
+Cflags: -I${includedir} -I${includedir}/redist

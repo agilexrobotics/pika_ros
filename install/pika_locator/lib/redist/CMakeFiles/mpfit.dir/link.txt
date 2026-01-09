@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmpfit.a CMakeFiles/mpfit.dir/mpfit/mpfit.c.o
+/usr/bin/ranlib libmpfit.a

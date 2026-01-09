@@ -1,0 +1,74 @@
+/**:
+  ros__parameters:
+    dataInfo:
+
+      camera:
+        color:
+          names: ['pikaGripperDepthCamera_l', 'pikaGripperDepthCamera_r', 'pikaGripperFisheyeCamera_l', 'pikaGripperFisheyeCamera_r']
+          parentFrames: ['gripper/camera_l_link', 'gripper/camera_r_link', 'gripper/camera_fisheye_l_link', 'gripper/camera_fisheye_r_link']
+          topics: ['/gripper/camera_l/color/image_raw', '/gripper/camera_r/color/image_raw', '/gripper/camera_fisheye_l/color/image_raw', '/gripper/camera_fisheye_r/color/image_raw']
+          configTopics: ['/gripper/camera_l/color/camera_info', '/gripper/camera_r/color/camera_info', '/gripper/camera_fisheye_l/color/camera_info', '/gripper/camera_fisheye_r/color/camera_info']
+        depth:
+          names: ['pikaGripperDepthCamera_l', 'pikaGripperDepthCamera_r']
+          parentFrames: ['gripper/camera_l_link', 'gripper/camera_r_link']
+          topics: ['/gripper/camera_l/aligned_depth_to_color/image_raw', '/gripper/camera_r/aligned_depth_to_color/image_raw']
+          configTopics: ['/gripper/camera_l/aligned_depth_to_color/camera_info', '/gripper/camera_r/aligned_depth_to_color/camera_info']
+        # pointCloud:
+        #   names: []
+        #   parentFrames: []
+        #   topics: []
+        #   configTopics: []
+        #   maxDistances: []
+        #   downSizes: []
+
+      arm:
+        jointState:
+          names: ['masterLeft', 'masterRight', 'puppetLeft', 'puppetLeft']
+          topics: ['/joint_states_gripper_l', '/joint_states_gripper_r', '/joint_states_single_gripper_l', '/joint_states_single_gripper_r']
+        endPose:
+          names: ['masterLeft', 'masterRight', 'puppetLeft', 'puppetLeft']
+          topics: ['/piper_IK_l/receive_end_pose_orient', '/piper_IK_r/receive_end_pose_orient', '/piper_FK_l/urdf_end_pose_orient', '/piper_FK_r/urdf_end_pose_orient']
+          orients: [true, true, true, true]
+
+      localization:
+        pose:
+          names: ['pika_l', 'pika_r']
+          topics: ['/pika_pose_l', '/pika_pose_r']
+
+      gripper:
+        encoder:
+          names: ['pikaSensor_l', 'pikaSensor_r', 'pikaGripper_l', 'pikaGripper_r']
+          topics: ['/sensor/gripper_l/data', '/sensor/gripper_r/data', '/gripper/gripper_l/data', '/gripper/gripper_r/data']
+
+      # imu:
+      #   9axis:
+      #     names: []
+      #     topics: []
+
+      # lidar:
+      #   pointCloud:
+      #     names: []
+      #     topics: []
+      #     xDistanceUppers: []
+      #     xDistanceLowers: []
+      #     yDistanceUppers: []
+      #     yDistanceLowers: []
+      #     zDistanceUppers: []
+      #     zDistanceLowers: []
+      #     downSizes: []
+
+      # robotBase:
+      #   vel:
+      #     names: []
+      #     topics: []
+
+      # lift:
+      #   motor:
+      #     names: []
+      #     topics: []
+      #     pubTopics: []
+      
+      # tf:
+      #   transform:
+      #     parentFrames: []
+      #     childFrames: []

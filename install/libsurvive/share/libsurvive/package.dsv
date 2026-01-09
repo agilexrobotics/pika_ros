@@ -1,0 +1,9 @@
+source;share/libsurvive/hook/ld_library_path_lib.ps1
+source;share/libsurvive/hook/ld_library_path_lib.dsv
+source;share/libsurvive/hook/ld_library_path_lib.sh
+source;share/libsurvive/hook/path.ps1
+source;share/libsurvive/hook/path.dsv
+source;share/libsurvive/hook/path.sh
+source;share/libsurvive/hook/pythonscriptspath.ps1
+source;share/libsurvive/hook/pythonscriptspath.dsv
+source;share/libsurvive/hook/pythonscriptspath.sh

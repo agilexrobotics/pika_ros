@@ -3,8 +3,8 @@ SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 camera_fps=30
 camera_width=640
 camera_height=480
-sensor_depth_camera_no=230322270606
-gripper_depth_camera_no=230322274868
+sensor_depth_camera_no=230322275875
+gripper_depth_camera_no=230322270069
 
 sensor_serial_port=/dev/ttyUSB50
 gripper_serial_port=/dev/ttyUSB60

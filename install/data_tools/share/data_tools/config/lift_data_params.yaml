@@ -1,0 +1,74 @@
+/**:
+  ros__parameters:
+    dataInfo:
+
+      camera:
+        color:
+          names: ['down', 'front', 'left', 'right']
+          parentFrames: ['camera_down_link', 'camera_f_link', 'camera_l_link', 'camera_r_link']
+          topics: ['/camera_down/color/image_raw', '/camera_f/color/image_raw', '/camera_l/color/image_raw', '/camera_r/color/image_raw']
+          configTopics: ['/camera_down/color/camera_info', '/camera_f/color/camera_info', '/camera_l/color/camera_info', '/camera_r/color/camera_info']
+        # depth:
+        #   names: []
+        #   parentFrames: []
+        #   topics: []
+        #   configTopics: []
+        # pointCloud:
+        #   names: []
+        #   parentFrames: []
+        #   topics: []
+        #   configTopics: []
+        #   maxDistances: []
+        #   downSizes: []
+
+      arm:
+        jointState:
+          names: ['puupet_arm_left', 'puupet_arm_right', 'puupet_gripper_left', 'puupet_gripper_right']
+          topics: ['/rm_left/joint_states', '/rm_right/joint_states', '/dh_left/gripper/joint_states', '/dh_right/gripper/joint_states']
+        # endPose:
+        #   names: []
+        #   topics: []
+        #   orients: []
+
+      # localization:
+      #   pose:
+      #     names: []
+      #     topics: []
+
+      # gripper:
+      #   encoder:
+      #     names: []
+      #     topics: []
+
+      # imu:
+      #   9axis:
+      #     names: []
+      #     topics: []
+
+      # lidar:
+      #   pointCloud:
+      #     names: []
+      #     topics: []
+      #     xDistanceUppers: []
+      #     xDistanceLowers: []
+      #     yDistanceUppers: []
+      #     yDistanceLowers: []
+      #     zDistanceUppers: []
+      #     zDistanceLowers: []
+      #     downSizes: []
+
+      lift:
+        motor:
+          names: ['body']
+          topics: ['/lifter_1/LiftMotorStatePub']
+          pubTopics: ['/lifter_1/LiftMotorStatePub']
+
+      robotBase:
+        vel:
+          names: ['chassis']
+          topics: ['/ranger_base_node/odom']
+      
+      # tf:
+      #   transform:
+      #     parentFrames: []
+      #     childFrames: []

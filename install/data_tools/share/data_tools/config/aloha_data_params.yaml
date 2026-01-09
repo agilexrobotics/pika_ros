@@ -1,0 +1,87 @@
+/**:
+  ros__parameters:
+    dataInfo:
+
+      camera:
+        color:
+          checkFrameRate: 25
+          names: ['left', 'front', 'right']
+          parentFrames: ['camera_l_link', 'camera_f_link', 'camera_r_link']
+          topics: ['/camera_l/color/image_raw', '/camera_f/color/image_raw', '/camera_r/color/image_raw']
+          configTopics: ['/camera_l/color/camera_info', '/camera_f/color/camera_info', '/camera_r/color/camera_info']
+        depth:
+          checkFrameRate: 25
+          names: ['left', 'front', 'right']
+          parentFrames: ['camera_l_link', 'camera_f_link', 'camera_r_link']
+          topics: ['/camera_l/aligned_depth_to_color/image_raw', '/camera_f/aligned_depth_to_color/image_raw', '/camera_r/aligned_depth_to_color/image_raw']
+          configTopics: ['/camera_l/aligned_depth_to_color/camera_info', '/camera_f/aligned_depth_to_color/camera_info', '/camera_r/aligned_depth_to_color/camera_info']
+        # pointCloud:
+        #   names: []
+        #   parentFrames: []
+        #   topics: []
+        #   configTopics: []
+        #   maxDistances: []
+        #   downSizes: []
+
+      arm:
+        jointState:
+          checkFrameRate: 180
+          names: ['masterLeft', 'masterRight', 'puppetLeft', 'puppetRight']
+          topics: ['/master/joint_left', '/master/joint_right', '/puppet/joint_left', '/puppet/joint_right']
+        # endPose:
+        #   names: []
+        #   topics: []
+        #   orients: []
+
+      localization:
+        pose:
+          checkFrameRate: 180
+          names: ['puppetLeft', 'puppetRight']
+          topics: ['/puppet/end_pose_left', '/puppet/end_pose_right']
+
+      # gripper:
+      #   encoder:
+      #     names: []
+      #     topics: []
+
+      # imu:
+      #   9axis:
+      #     names: []
+      #     topics: []
+
+      # lidar:
+      #   pointCloud:
+      #     names: []
+      #     topics: []
+      #     xDistanceUppers: []
+      #     xDistanceLowers: []
+      #     yDistanceUppers: []
+      #     yDistanceLowers: []
+      #     zDistanceUppers: []
+      #     zDistanceLowers: []
+      #     downSizes: []
+
+      # robotBase:
+      #   vel:
+      #     names: []
+      #     topics: []
+
+      # lift:
+      #   motor:
+      #     names: []
+      #     topics: []
+      #     pubTopics: []
+
+      # transform:
+      #   tf:
+      #     checkFrameRate: 8
+      #     names: ["transform"]
+      #     topics: ["/tf"]
+      #     childFrames: []
+      #     parentFrames: []
+      #   tf_static:
+      #     checkFrameRate: 0
+      #     names: ["transform"]
+      #     topics: ["/tf_static"]
+      #     childFrames: []
+      #     parentFrames: []
