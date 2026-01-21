@@ -115,10 +115,10 @@ def generate_setup_bash(left_info, right_info, select):
         to1 = ">"
         to2 = ">"
     if select == "4":
-        path = "setup_header.bash"
+        path = "setup_helmet.bash"
         usb_num1 = 70
         usb_num2 = None
-        name1 = "header_"
+        name1 = "helmet_"
         name2 = None
         to1 = ">"
         to2 = None
@@ -227,21 +227,21 @@ source /opt/ros/humble/setup.bash && cd $SCRIPT_DIR/../install/sensor_tools/shar
 source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_sensor_gripper.launch.py sensor_depth_camera_no:=_$sensor_depth_camera_no gripper_depth_camera_no:=_$gripper_depth_camera_no sensor_serial_port:=$sensor_serial_port gripper_serial_port:=$gripper_serial_port sensor_fisheye_port:=$sensor_fisheye_port gripper_fisheye_port:=$gripper_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
                 """
     if select == "4":
-        path = "start_header.bash"
+        path = "start_helmet.bash"
         usb_num1 = 70
         content = f"""
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 camera_fps=30
 camera_width=640
 camera_height=480
-header_depth_camera_no={left_info[0]}
-header_serial_port=/dev/ttyUSB{usb_num1}
+helmet_depth_camera_no={left_info[0]}
+helmet_serial_port=/dev/ttyUSB{usb_num1}
 sudo chmod a+rw /dev/ttyUSB*
-header_fisheye_port={usb_num1}
+helmet_fisheye_port={usb_num1}
 sudo chmod a+rw /dev/video*
 
 source /opt/ros/humble/setup.bash && cd $SCRIPT_DIR/../install/sensor_tools/share/sensor_tools/scripts/ && chmod 777 usb_camera.py
-source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_header.launch.py depth_camera_no:=_$header_depth_camera_no serial_port:=$header_serial_port fisheye_port:=$header_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
+source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_helmet.launch.py depth_camera_no:=_$helmet_depth_camera_no serial_port:=$helmet_serial_port fisheye_port:=$helmet_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
                 """
     with open(path, "w") as f:
         f.write(content)
@@ -252,7 +252,7 @@ def main():
     print("=== pika配置工具 ===")
     select = None
     while True:
-        select = input("请选择绑定\n1.两个pika sensor(手持夹爪)\n2.两个pika gripper(安装于机械臂上的夹爪)\n3.一个pika sensor 一个pika gripper\n4.一个pika header\n请输入：")
+        select = input("请选择绑定\n1.两个pika sensor(手持夹爪)\n2.两个pika gripper(安装于机械臂上的夹爪)\n3.一个pika sensor 一个pika gripper\n4.一个pika helmet\n请输入：")
         if select == "1":
             device1 = "左"
             device2 = "右"
@@ -266,7 +266,7 @@ def main():
             device2 = "gripper"
             break
         if select == "4":
-            device1 = "header"
+            device1 = "helmet"
             device2 = None
             break
         else:
@@ -303,8 +303,8 @@ def main():
     print("正在生成配置文件...")
     generate_setup_bash(left_info, right_info, select)
     generate_start_bash(left_info, right_info, select)
-    setup_path = "setup_multi_sensor.bash" if select=="1" else ("setup_multi_gripper.bash" if select=="2" else ("setup_sensor_gripper.bash" if select == "3" else "setup_header.bash"))
-    start_path = "start_multi_sensor.bash" if select=="1" else ("start_multi_gripper.bash" if select=="2" else ("start_sensor_gripper.bash" if select == "3" else "start_header.bash"))
+    setup_path = "setup_multi_sensor.bash" if select=="1" else ("setup_multi_gripper.bash" if select=="2" else ("setup_sensor_gripper.bash" if select == "3" else "setup_helmet.bash"))
+    start_path = "start_multi_sensor.bash" if select=="1" else ("start_multi_gripper.bash" if select=="2" else ("start_sensor_gripper.bash" if select == "3" else "start_helmet.bash"))
     print("配置完成！已生成以下文件：")
     print(f"1. {setup_path}")
     print(f"2. {start_path}")
@@ -343,7 +343,7 @@ def main():
             print("找不到gripper（右）串口")
             continue
         if (select == "4") and usb_list.find("70") < 0:
-            print("找不到header串口")
+            print("找不到helmet串口")
             continue
         break
     print("绑定成功，启动设备方法：")
