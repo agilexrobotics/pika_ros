@@ -328,12 +328,11 @@ class RosOperator: public rclcpp::Node{
 				if(nowColorStatus != lastColorStatus){
 					lastColorStatusTime = rclcpp::Clock().now().seconds();
 					lastColorStatus = nowColorStatus;
-				}
-
-				std::vector<uint8_t> command = createBinaryCommand<int>(LIGHT_CTRL, std::vector<int>{static_cast<int>(nowColorStatus)}, true);
-				std::lock_guard<std::mutex> serialLock(serialMtx);
-				if(serial && serial->is_open()){
-					boost::asio::write(*serial, boost::asio::buffer(command));
+					std::vector<uint8_t> command = createBinaryCommand<int>(LIGHT_CTRL, std::vector<int>{static_cast<int>(nowColorStatus)}, true);
+					std::lock_guard<std::mutex> serialLock(serialMtx);
+					if(serial && serial->is_open()){
+						boost::asio::write(*serial, boost::asio::buffer(command));
+					}
 				}
 			}
 			rate2.sleep();
