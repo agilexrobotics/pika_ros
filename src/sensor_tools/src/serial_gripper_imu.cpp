@@ -678,16 +678,46 @@ class RosOperator: public rclcpp::Node{
 					try{
 						jsonReader.parse(str, root);
 						if(isHeader){
+							// if(root.isMember("IMU")){
+							// 	sensor_msgs::msg::Imu imu;
+							// 	imu.header.stamp = time;
+							// 	Json::Value IMUValue = root["IMU"];
+							// 	imu.header.stamp = time;
+							// 	tf2::Quaternion quat_tf;
+							// 	quat_tf.setRPY(IMUValue["roll"].asDouble(), IMUValue["pitch"].asDouble(), IMUValue["yaw"].asDouble());
+							// 	geometry_msgs::msg::Quaternion quat_msg;
+							// 	tf2::convert(quat_tf, quat_msg);
+							// 	imu.orientation = quat_msg;
+							// 	imu.angular_velocity.x = IMUValue["gyr"][0].asDouble();
+							// 	imu.angular_velocity.y = IMUValue["gyr"][1].asDouble();
+							// 	imu.angular_velocity.z = IMUValue["gyr"][2].asDouble();
+							// 	imu.linear_acceleration.x = IMUValue["acc"][0].asDouble();
+							// 	imu.linear_acceleration.y = IMUValue["acc"][1].asDouble();
+							// 	imu.linear_acceleration.z = IMUValue["acc"][2].asDouble();
+							// 	pubImu->publish(imu);
+							// }
+
 							if(root.isMember("IMU")){
 								sensor_msgs::msg::Imu imu;
 								imu.header.stamp = time;
 								Json::Value IMUValue = root["IMU"];
-								imu.header.stamp = time;
-								tf2::Quaternion quat_tf;
-								quat_tf.setRPY(IMUValue["roll"].asDouble(), IMUValue["pitch"].asDouble(), IMUValue["yaw"].asDouble());
-								geometry_msgs::msg::Quaternion quat_msg;
-								tf2::convert(quat_tf, quat_msg);
-								imu.orientation = quat_msg;
+								// 如果IMUValue["quat"]字段存在且有效，可以使用四元数直接赋值
+								if (IMUValue["quat"].isArray())
+								{
+									imu.orientation.w = IMUValue["quat"][0].asDouble();
+									imu.orientation.x = IMUValue["quat"][1].asDouble();
+									imu.orientation.y = IMUValue["quat"][2].asDouble();
+									imu.orientation.z = IMUValue["quat"][3].asDouble();
+								}
+								else
+								{
+									// 否则，使用欧拉角转换为四元数
+									imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(
+										IMUValue["roll"].asDouble(),
+										IMUValue["pitch"].asDouble(),
+										IMUValue["yaw"].asDouble()
+									);
+								}							
 								imu.angular_velocity.x = IMUValue["gyr"][0].asDouble();
 								imu.angular_velocity.y = IMUValue["gyr"][1].asDouble();
 								imu.angular_velocity.z = IMUValue["gyr"][2].asDouble();
