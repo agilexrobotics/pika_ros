@@ -62,7 +62,7 @@ def pcd_to_msg(points):
     return ros_numpy.point_cloud2.array_to_pointcloud2(points, stamp=rospy.Time.now(), frame_id="camera")
 
 
-# 保存数据函数
+# Data processing function
 def process_data(args, ros_operator):
 
     episode_dir = os.path.join(args.datasetDir, "episode" + str(args.episodeIndex))

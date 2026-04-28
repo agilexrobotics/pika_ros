@@ -75,7 +75,7 @@ class EpisodicDataset(torch.utils.data.Dataset):
             action = root['/localization/pose/pika'][()]
             qpos = torch.from_numpy(qpos[start_index]).float()
             action = torch.from_numpy(action[start_index]).float()
-            # root['/arm/endPose/puppetLeft'][()]  根据需要获取
+            # root['/arm/endPose/puppetLeft'][()]  fetch as needed
             # root['/arm/endPose/puppetRight'][()]
             # root['/arm/endPose/masterLeft'][()]
             # root['/arm/endPose/masterRight'][()]

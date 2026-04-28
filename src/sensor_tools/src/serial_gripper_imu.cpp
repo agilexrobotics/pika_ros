@@ -234,16 +234,16 @@ class RosOperator{
 
 		lastCommandAngle = -1;
 		
-		// 初始化线程指针
+		// Initialize thread pointers
 		receivingThread = nullptr;
 		statusSendingThread = nullptr;
-		
-		// 初始化serial指针
+
+		// Initialize serial pointer
 		serial = nullptr;
     }
 
 	~RosOperator(){
-		// 等待并清理线程
+		// Wait for and clean up threads
 		if(receivingThread && receivingThread->joinable()){
 			receivingThread->join();
 			delete receivingThread;
@@ -254,7 +254,7 @@ class RosOperator{
 			delete statusSendingThread;
 			statusSendingThread = nullptr;
 		}
-		// 关闭串口
+		// Close serial port
 		if(serial && serial->is_open()){
 			serial->close();
 		}
@@ -311,7 +311,7 @@ class RosOperator{
 		int lastColorStatus = -1;
 		double lastColorStatusTime = -1;
 		while(ros::ok()){
-			// 处理颜色状态
+			// Handle color status
 			{
 				std::lock_guard<std::mutex> colorLock(colorStatusMtx);
 				if(colorStatus[COLOR_BLUE]){
@@ -344,7 +344,7 @@ class RosOperator{
 				}
 			}
 			rate2.sleep();
-			// 处理振动状态
+			// Handle vibration status
 			{
 				int nowVibrateStatus = VIBRATE_NONE;
 				{
@@ -565,16 +565,16 @@ class RosOperator{
 
 	int c2i(char ch)  
 	{  
-			// 如果是数字，则用数字的ASCII码减去48, 如果ch = '2' ,则 '2' - 48 = 2  
+			// If digit, subtract 48 from ASCII code, e.g. '2' - 48 = 2
 			if(isdigit(ch))  
 					return ch - 48;  
 	
-			// 如果是字母，但不是A~F,a~f则返回  
+			// If letter but not A~F or a~f, return
 			if( ch < 'A' || (ch > 'F' && ch < 'a') || ch > 'z' )  
 					return -1;  
 	
-			// 如果是大写字母，则用数字的ASCII码减去55, 如果ch = 'A' ,则 'A' - 55 = 10  
-			// 如果是小写字母，则用数字的ASCII码减去87, 如果ch = 'a' ,则 'a' - 87 = 10  
+			// If uppercase, subtract 55 from ASCII code, e.g. 'A' - 55 = 10
+			// If lowercase, subtract 87 from ASCII code, e.g. 'a' - 87 = 10
 			if(isalpha(ch))  
 					return isupper(ch) ? ch - 55 : ch - 87;  
 	
@@ -589,27 +589,27 @@ class RosOperator{
 			int bits;  
 			int i;  
 			
-			// 此例中 hex = "1de" 长度为3, hex是main函数传递的  
+			// In this example hex = "1de", length is 3, passed from main
 			len = strlen(hex);  
 	
 			for (i=0, temp=0; i<len; i++, temp=0)  
 			{  
-					// 第一次：i=0, *(hex + i) = *(hex + 0) = '1', 即temp = 1  
-					// 第二次：i=1, *(hex + i) = *(hex + 1) = 'd', 即temp = 13  
-					// 第三次：i=2, *(hex + i) = *(hex + 2) = 'd', 即temp = 14  
+					// 1st pass: i=0, *(hex + i) = '1', temp = 1
+					// 2nd pass: i=1, *(hex + i) = 'd', temp = 13
+					// 3rd pass: i=2, *(hex + i) = 'e', temp = 14
 					temp = c2i( *(hex + i) );  
-					// 总共3位，一个16进制位用 4 bit保存  
-					// 第一次：'1'为最高位，所以temp左移 (len - i -1) * 4 = 2 * 4 = 8 位  
-					// 第二次：'d'为次高位，所以temp左移 (len - i -1) * 4 = 1 * 4 = 4 位  
-					// 第三次：'e'为最低位，所以temp左移 (len - i -1) * 4 = 0 * 4 = 0 位  
+					// 3 digits total, each hex digit uses 4 bits
+					// 1st: '1' is MSB, left shift (len-i-1)*4 = 8 bits
+					// 2nd: 'd' is middle, left shift (len-i-1)*4 = 4 bits
+					// 3rd: 'e' is LSB, left shift (len-i-1)*4 = 0 bits
 					bits = (len - i - 1) * 4;  
 					temp = temp << bits;  
 	
-					// 此处也可以用 num += temp;进行累加  
+					// Can also use num += temp to accumulate
 					num = num | temp;  
 			}  
 	
-			// 返回结果  
+			// Return result
 			return num;  
 	}  
 
@@ -621,11 +621,11 @@ class RosOperator{
 		return width;
 	}
 
-    // 反向求解函数，输入 width，输出 angle，使用二分法
+    // Inverse solver: given width, output angle, using binary search
     double getAngle(double targetWidth, double tol = 1e-6, int maxIterations = 1000) {
-        // 定义角度的搜索范围
+        // Define angle search range
         double left = 0.0;
-        double right = M_PI; // 假设角度在0到90度之间
+        double right = M_PI; // Assume angle is between 0 and pi
 
         for (int i = 0; i < maxIterations; ++i) {
             double mid = (left + right) / 2;
@@ -642,7 +642,7 @@ class RosOperator{
             }
         }
         
-        // 如果没有找到精确解，返回最后的中间值
+        // If no exact solution found, return the last midpoint
         return (left + right) / 2;
     }
 
@@ -726,7 +726,7 @@ class RosOperator{
 							sensor_msgs::Imu imu;
 							imu.header.stamp = time;
 							Json::Value IMUValue = root["IMU"];
-							// 如果IMUValue["quat"]字段存在且有效，可以使用四元数直接赋值
+							// If IMUValue["quat"] field exists and is valid, use quaternion directly
 							if (IMUValue["quat"].isArray())
 							{
 								imu.orientation.w = IMUValue["quat"][0].asDouble();
@@ -736,7 +736,7 @@ class RosOperator{
 							}
 							else
 							{
-								// 否则，使用欧拉角转换为四元数
+								// Otherwise, convert Euler angles to quaternion
 								imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(
 									IMUValue["roll"].asDouble(),
 									IMUValue["pitch"].asDouble(),

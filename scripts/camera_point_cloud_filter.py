@@ -50,32 +50,32 @@ def create_transformation_matrix(x, y, z, roll, pitch, yaw):
 
 
 def depth_to_color_projection(depth_image, color_intrinsic, depth_intrinsic, extrinsic):
-    # 获取深度图像的宽度和高度
+    # Get depth image width and height
     depth_height, depth_width = depth_image.shape[:2]
 
-    # 创建网格坐标
+    # Create mesh grid coordinates
     u, v = np.meshgrid(np.arange(depth_width), np.arange(depth_height))
     u = u.flatten()
     v = v.flatten()
     depth_values = depth_image.flatten()
 
-    # 将像素坐标转换为齐次坐标
+    # Convert pixel coordinates to homogeneous coordinates
     depth_points = np.vstack((u, v, np.ones_like(u)))
 
-    # 将深度图像中的点转换到深度相机坐标系
+    # Transform points from depth image to depth camera coordinate system
     X_depth = np.linalg.inv(depth_intrinsic) @ depth_points
 
-    # 将深度相机坐标系中的点转换到彩色相机坐标系
+    # Transform points from depth camera to color camera coordinate system
     X_color = extrinsic @ np.vstack((X_depth, np.ones((1, X_depth.shape[1]))))
 
-    # 将彩色相机坐标系中的点投影到彩色图像平面
+    # Project points from color camera coordinate system to color image plane
     x_color = (color_intrinsic[0, 0] * (X_color[0, :] / X_color[2, :]) + color_intrinsic[0, 2]).round().astype(int)
     y_color = (color_intrinsic[1, 1] * (X_color[1, :] / X_color[2, :]) + color_intrinsic[1, 2]).round().astype(int)
 
-    # 创建对齐后的深度图像
+    # Create aligned depth image
     aligned_depth = np.zeros_like(depth_image)
 
-    # 将投影后的点存储到对齐后的深度图像中
+    # Store projected points into aligned depth image
     valid_indices = (x_color >= 0) & (x_color < depth_image.shape[1]) & (y_color >= 0) & (y_color < depth_image.shape[0])
     aligned_depth[y_color[valid_indices], x_color[valid_indices]] = depth_values[valid_indices]
 
@@ -83,45 +83,45 @@ def depth_to_color_projection(depth_image, color_intrinsic, depth_intrinsic, ext
 
 
 def color_depth_to_point_cloud(color_image_path, depth_image_path, color_intrinsic, depth_intrinsic, color_extrinsic, depth_extrinsic):
-    # 读取 color 图像
+    # Read color image
     color_image = cv2.imread(color_image_path)
     if color_image is None:
         raise FileNotFoundError(f"color image {color_image_path} not found")
 
-    # 读取深度图像
+    # Read depth image
     depth_image = cv2.imread(depth_image_path, cv2.IMREAD_ANYDEPTH)
     if depth_image is None:
         raise FileNotFoundError(f"Depth image {depth_image_path} not found")
     if not np.array_equal(color_extrinsic, depth_extrinsic):
         depth_image = depth_to_color_projection(depth_image, color_intrinsic, depth_intrinsic, np.dot(np.linalg.inv(color_extrinsic), depth_extrinsic))
-        # 相机内参矩阵
+        # Camera intrinsic matrix
         fx, fy = color_intrinsic[0][0], color_intrinsic[1][1]
         cx, cy = color_intrinsic[0][2], color_intrinsic[1][2]
     else:
-        # 相机内参矩阵
+        # Camera intrinsic matrix
         fx, fy = depth_intrinsic[0][0], depth_intrinsic[1][1]
         cx, cy = depth_intrinsic[0][2], depth_intrinsic[1][2]
-    # 获取图像的宽度和高度
+    # Get image width and height
     height, width = depth_image.shape
 
     u, v = np.meshgrid(np.arange(width), np.arange(height))
     u = u.astype(np.float32)
     v = v.astype(np.float32)
-    z = depth_image.astype(np.float32) / 1000.0  # 将深度图像转换为米
+    z = depth_image.astype(np.float32) / 1000.0  # Convert depth image to meters
 
-    # 计算 3D 坐标
+    # Compute 3D coordinates
     x = (u - cx) * z / fx
     y = (v - cy) * z / fy
 
-    # 提取 color 颜色值
+    # Extract color values
     b = color_image[..., 0].astype(np.float32)
     g = color_image[..., 1].astype(np.float32)
     r = color_image[..., 2].astype(np.float32)
 
-    # 合并为点云
+    # Merge into point cloud
     point_cloud = np.stack((x, y, z, r, g, b), axis=-1)
 
-    # 跳过深度为零的点
+    # Skip points with zero depth
     valid_mask = z > 0.0
     point_cloud = point_cloud[valid_mask]
 
