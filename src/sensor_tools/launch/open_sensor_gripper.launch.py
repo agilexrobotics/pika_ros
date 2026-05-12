@@ -17,11 +17,9 @@ def generate_launch_description():
         DeclareLaunchArgument('camera_height', default_value='480'),
         DeclareLaunchArgument('camera_width', default_value='640'),
         DeclareLaunchArgument('camera_profile', default_value='640x480x30'),
-        DeclareLaunchArgument('sensor_fisheye_port', default_value='22'),
         DeclareLaunchArgument('gripper_fisheye_port', default_value='23'),
         DeclareLaunchArgument('sensor_serial_port', default_value='/dev/ttyUSB0'),
         DeclareLaunchArgument('gripper_serial_port', default_value='/dev/ttyUSB1'),
-        DeclareLaunchArgument('sensor_depth_camera_no', default_value='230322270688'),
         DeclareLaunchArgument('gripper_depth_camera_no', default_value='230322272619'),
         DeclareLaunchArgument('sensor_joint_name', default_value='sensor_gripper_center_joint'),
         DeclareLaunchArgument('gripper_joint_name', default_value='gripper_gripper_center_joint'),
@@ -34,11 +32,9 @@ def generate_launch_description():
     camera_height = LaunchConfiguration('camera_height')
     camera_width = LaunchConfiguration('camera_width')
     camera_profile = LaunchConfiguration('camera_profile')
-    sensor_fisheye_port = LaunchConfiguration('sensor_fisheye_port')
     gripper_fisheye_port = LaunchConfiguration('gripper_fisheye_port')
     sensor_serial_port = LaunchConfiguration('sensor_serial_port')
     gripper_serial_port = LaunchConfiguration('gripper_serial_port')
-    sensor_depth_camera_no = LaunchConfiguration('sensor_depth_camera_no')
     gripper_depth_camera_no = LaunchConfiguration('gripper_depth_camera_no')
     sensor_joint_name = LaunchConfiguration('sensor_joint_name')
     gripper_joint_name = LaunchConfiguration('gripper_joint_name')
@@ -51,17 +47,8 @@ def generate_launch_description():
         PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('pika_locator'), 'launch', 'pika_single_locator.launch.py')])
     )
 
-    l_depth_camera_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('realsense2_camera'), 'launch', 'rs_launch.py')]),
-        launch_arguments={'serial_no': sensor_depth_camera_no,
-                          'camera_namespace': "sensor",
-                          'camera_name': "camera",
-                          'rgb_camera.color_profile': camera_profile, 
-                          'depth_module.color_profile': camera_profile, 
-                          'depth_module.depth_profile': camera_profile,
-                          'depth_module.infra_profile': camera_profile}.items()
-    )
-    r_depth_camera_launch = IncludeLaunchDescription(
+
+    gripper_depth_camera_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('realsense2_camera'), 'launch', 'rs_launch.py')]),
         launch_arguments={'serial_no': gripper_depth_camera_no,
                           'camera_namespace': "gripper",
@@ -74,24 +61,7 @@ def generate_launch_description():
 
     return LaunchDescription(declared_arguments+[
         locator_launch,
-        l_depth_camera_launch,
-        r_depth_camera_launch,
-        Node(
-            package='sensor_tools',
-            executable='usb_camera.py',
-            name='sensor_camera_fisheye',
-            parameters=[{'camera_port': sensor_fisheye_port,
-                         'camera_fps': camera_fps,
-                         'camera_height': camera_height,
-                         'camera_width': camera_width,
-                         'camera_frame_id': "sensor/camera_fisheye_link"}],
-            remappings=[
-                ('/camera_rgb/color/image_raw', '/sensor/camera_fisheye/color/image_raw'),
-                ('/camera_rgb/color/camera_info', '/sensor/camera_fisheye/color/camera_info')
-            ],
-            respawn=True,
-            output='screen'
-        ),
+        gripper_depth_camera_launch,
         Node(
             package='sensor_tools',
             executable='usb_camera.py',

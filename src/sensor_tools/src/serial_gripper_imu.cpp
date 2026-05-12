@@ -712,11 +712,13 @@ class RosOperator: public rclcpp::Node{
 								else
 								{
 									// 否则，使用欧拉角转换为四元数
-									imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(
+									tf2::Quaternion quat_tf;
+									quat_tf.setRPY(
 										IMUValue["roll"].asDouble(),
 										IMUValue["pitch"].asDouble(),
 										IMUValue["yaw"].asDouble()
 									);
+									imu.orientation = tf2::toMsg(quat_tf);
 								}							
 								imu.angular_velocity.x = IMUValue["gyr"][0].asDouble();
 								imu.angular_velocity.y = IMUValue["gyr"][1].asDouble();
