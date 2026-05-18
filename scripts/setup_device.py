@@ -5,6 +5,30 @@ import re
 import os
 import cv2
 import time
+import os
+from pathlib import Path
+
+def set_env_var_persistent(key, value, shell_rc="~/.bashrc"):
+    rc_path = Path(shell_rc).expanduser()
+    if not rc_path.exists():
+        rc_path.touch()
+
+    lines = rc_path.read_text().splitlines()
+    export_line = f'export {key}={value}'
+    updated = False
+
+    for i, line in enumerate(lines):
+        if line.startswith(f"export {key}="):
+            lines[i] = export_line
+            updated = True
+            break
+
+    if not updated:
+        lines.append(export_line)
+
+    rc_path.write_text("\n".join(lines) + "\n")
+    print(f"Updated {rc_path}")
+
 
 def run_command(command):
     """运行命令并返回输出"""
@@ -16,19 +40,19 @@ def run_command(command):
         return None
 
 
-def get_device_info():
+def get_device_info(localization_tag=True):
     """获取设备信息"""
     # 运行 rs-enumerate-devices 命令
     rs_output = run_command("rs-enumerate-devices -s")
     if not rs_output:
         print("无法获取到深度摄像头数据")
-        return None, None
+        return None, None, None, None
 
     # 解析输出获取序列号
     serial_match = re.search(r'Intel RealSense D405\s+(\d+)', rs_output)
     if not serial_match:
         print("无法获取到深度摄像头数据")
-        return None, None
+        return None, None, None, None
     serial_number = serial_match.group(1)
 
     # 运行 udevadm 命令
@@ -36,11 +60,11 @@ def get_device_info():
     count = ls_output.count("tty")
     if count > 1:
         print("请确保工控机只插入一个USB串口设备")
-        return None, None
+        return None, None, None, None
     udev_output = run_command(f"udevadm info /dev/{ls_output} | grep DEVPATH")
     if not udev_output:
         print("无法获取到串口数据")
-        return None, None
+        return None, None, None, None
 
     # 解析 USB 路径
     usb_path = udev_output[:udev_output.find(ls_output)][:-1]  # 获取 1-13.2.4:1.0 这样的格式
@@ -86,7 +110,26 @@ def get_device_info():
     video_path = udev_output[:udev_output.find("video")][:-1]  # 获取 1-13.2.4:1.0 这样的格式
     video_path = video_path[video_path.rfind("/")+1:]
 
-    return serial_number, usb_path, video_path
+    localization_tag_serial = None
+    if localization_tag:
+        # Find LHR device serial (28de:2300)
+        localization_tag_list = run_command("lsusb -d 28de:2300")
+        if localization_tag_list:
+            localization_tag_count = len([line for line in localization_tag_list.splitlines() if "28de:2300" in line])
+            if localization_tag_count > 1:
+                print("请确保工控机只插入一个定位标签设备")
+                return None, None, None, None
+
+        localization_tag_output = run_command("lsusb -v -d 28de:2300 2>/dev/null")
+        if not localization_tag_output:
+            localization_tag_output = run_command("lsusb -v | grep 28de:2300 -A 20")
+        localization_tag_serial_match = re.search(r'iSerial\s+\d+\s+([^\s]+)', localization_tag_output or "")
+        if not localization_tag_serial_match:
+            print("无法获取到设备定位标签序列号")
+            return None, None, None, None
+        localization_tag_serial = localization_tag_serial_match.group(1)
+
+    return serial_number, usb_path, video_path, localization_tag_serial
 
 
 def generate_setup_bash(left_info, right_info, select):
@@ -98,6 +141,9 @@ def generate_setup_bash(left_info, right_info, select):
         name2 = "sensor_"
         to1 = ">"
         to2 = ">>"
+        set_env_var_persistent("pika_L_code", left_info[3])
+        set_env_var_persistent("pika_R_code", right_info[3])
+
     if select == "2":
         path = "setup_multi_gripper.bash"
         usb_num1 = 60
@@ -114,6 +160,7 @@ def generate_setup_bash(left_info, right_info, select):
         name2 = "gripper_"
         to1 = ">"
         to2 = ">"
+        set_env_var_persistent("pika_code", left_info[3])
     if select == "4":
         path = "setup_helmet.bash"
         usb_num1 = 70
@@ -122,6 +169,7 @@ def generate_setup_bash(left_info, right_info, select):
         name2 = None
         to1 = ">"
         to2 = None
+        set_env_var_persistent("pika_H_code", left_info[3])
     """生成 setup.bash 文件"""
     if usb_num2 is not None:
         content = f"""
@@ -275,13 +323,13 @@ def main():
     input()
     print(f"正在获取{device1}设备信息...")
     while True:
-        left_info = get_device_info()
+        left_info = get_device_info(True if select == "1" or select == "3" else False)
         if not left_info[0]:
             print(f"无法获取{device1}设备信息，请检查设备连接，然后按回车键继续...")
             input()
         else:
             break
-    print(f"{device1}设备信息: {left_info[0]} {left_info[1]} {left_info[2]}")
+    print(f"{device1}设备信息: {left_info[0]} {left_info[1]} {left_info[2]} {left_info[3]}")
 
     right_info = None
     if device2 is not None:
@@ -289,13 +337,13 @@ def main():
         input()
         print(f"正在获取{device2}设备信息...")
         while True:
-            right_info = get_device_info()
+            right_info = get_device_info(True if select == "1" else False)
             if not right_info[0]:
                 print(f"无法获取{device2}设备信息，请检查设备连接，然后按回车键继续...")
                 input()
             else:
                 break
-        print(f"{device2}设备信息: {right_info[0]} {right_info[1]} {right_info[2]}")
+        print(f"{device2}设备信息: {right_info[0]} {right_info[1]} {right_info[2]} {right_info[3]}")
 
     # 生成配置文件
     print("正在生成配置文件...")

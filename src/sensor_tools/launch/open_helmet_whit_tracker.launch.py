@@ -33,6 +33,10 @@ def generate_launch_description():
     joint_name = LaunchConfiguration('joint_name')
     depth_camera_no = LaunchConfiguration('depth_camera_no')
 
+    # locator
+    locator_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('pika_locator'), 'launch', 'pika_single_locator.launch.py')])
+    )
     # depth camera
     depth_camera_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(get_package_share_directory('realsense2_camera'), 'launch', 'rs_launch.py')]),
@@ -46,6 +50,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription(declared_arguments+[
+        locator_launch,
         depth_camera_launch,
         Node(
             package='sensor_tools',
