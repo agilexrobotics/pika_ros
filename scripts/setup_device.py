@@ -132,7 +132,7 @@ def get_device_info(localization_tag=True):
     return serial_number, usb_path, video_path, localization_tag_serial
 
 
-def generate_setup_bash(left_info, right_info, select):
+def generate_setup_bash(left_info, right_info, select, helmet_with_tracker=False):
     if select == "1":
         path = "setup_multi_sensor.bash"
         usb_num1 = 50
@@ -169,7 +169,8 @@ def generate_setup_bash(left_info, right_info, select):
         name2 = None
         to1 = ">"
         to2 = None
-        set_env_var_persistent("pika_H_code", left_info[3])
+        if helmet_with_tracker:
+            set_env_var_persistent("pika_H_code", left_info[3])
     """生成 setup.bash 文件"""
     if usb_num2 is not None:
         content = f"""
@@ -199,7 +200,7 @@ sudo udevadm control --reload-rules && sudo service udev restart && sudo udevadm
     os.chmod(path, 0o755)
 
 
-def generate_start_bash(left_info, right_info, select):
+def generate_start_bash(left_info, right_info, select, helmet_with_tracker=False):
     if select == "1":
         path = "start_multi_sensor.bash"
         usb_num1 = 50
@@ -275,6 +276,7 @@ source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_sensor
     if select == "4":
         path = "start_helmet.bash"
         usb_num1 = 70
+        helmet_launch = "open_helmet_whit_tracker.launch.py" if helmet_with_tracker else "open_helmet.launch.py"
         content = f"""
 SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
 camera_fps=30
@@ -287,7 +289,7 @@ helmet_fisheye_port={usb_num1}
 sudo chmod a+rw /dev/video*
 
 source /opt/ros/humble/setup.bash && cd $SCRIPT_DIR/../install/sensor_tools/share/sensor_tools/scripts/ && chmod 777 usb_camera.py
-source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_helmet.launch.py depth_camera_no:=_$helmet_depth_camera_no serial_port:=$helmet_serial_port fisheye_port:=$helmet_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
+source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools {helmet_launch} depth_camera_no:=_$helmet_depth_camera_no serial_port:=$helmet_serial_port fisheye_port:=$helmet_fisheye_port camera_fps:=$camera_fps camera_width:=$camera_width camera_height:=$camera_height camera_profile:=$camera_width,$camera_height,$camera_fps
                 """
     with open(path, "w") as f:
         f.write(content)
@@ -296,6 +298,7 @@ source $SCRIPT_DIR/../install/setup.bash && ros2 launch sensor_tools open_helmet
 
 def main():
     print("=== pika配置工具 ===")
+    helmet_with_tracker = False
     select = None
     while True:
         select = input("请选择绑定\n1.两个pika sensor(手持夹爪)\n2.两个pika gripper(安装于机械臂上的夹爪)\n3.一个pika sensor 一个pika gripper\n4.一个pika helmet\n请输入：")
@@ -314,6 +317,8 @@ def main():
         if select == "4":
             device1 = "helmet"
             device2 = None
+            tracker_select = input("helmet是否带定位器(Tracker)？\n1.带定位器\n2.不带定位器\n请输入：").strip()
+            helmet_with_tracker = tracker_select == "1"
             break
         else:
             print("请输入1、2、3或4")
@@ -347,8 +352,8 @@ def main():
 
     # 生成配置文件
     print("正在生成配置文件...")
-    generate_setup_bash(left_info, right_info, select)
-    generate_start_bash(left_info, right_info, select)
+    generate_setup_bash(left_info, right_info, select, helmet_with_tracker)
+    generate_start_bash(left_info, right_info, select, helmet_with_tracker)
     setup_path = "setup_multi_sensor.bash" if select=="1" else ("setup_multi_gripper.bash" if select=="2" else ("setup_sensor_gripper.bash" if select == "3" else "setup_helmet.bash"))
     start_path = "start_multi_sensor.bash" if select=="1" else ("start_multi_gripper.bash" if select=="2" else ("start_sensor_gripper.bash" if select == "3" else "start_helmet.bash"))
     print("配置完成！已生成以下文件：")
