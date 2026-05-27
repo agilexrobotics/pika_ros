@@ -123,6 +123,7 @@ def generate_launch_description():
                 ('/teleop_status', '/teleop_status_l'),
                 ('/localization_status', '/pika_localization_status_l'),
                 ('/arm_control_status', '/arm_control_status_l'),
+                ('/data_tools_dataCapture/capture_service', '/data_tools_dataCapture/capture_service_l'),
             ],
             respawn=True,
             output='screen'
@@ -146,6 +147,7 @@ def generate_launch_description():
                 ('/teleop_status', '/teleop_status_r'),
                 ('/localization_status', '/pika_localization_status_r'),
                 ('/arm_control_status', '/arm_control_status_r'),
+                ('/data_tools_dataCapture/capture_service', '/data_tools_dataCapture/capture_service_r'),
             ],
             respawn=True,
             output='screen'
