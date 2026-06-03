@@ -328,7 +328,7 @@ def main():
     input()
     print(f"正在获取{device1}设备信息...")
     while True:
-        left_info = get_device_info(True if select == "1" or select == "3" else False)
+        left_info = get_device_info(True if select == "1" or select == "3" or (select == "4" and helmet_with_tracker) else False)
         if not left_info[0]:
             print(f"无法获取{device1}设备信息，请检查设备连接，然后按回车键继续...")
             input()
