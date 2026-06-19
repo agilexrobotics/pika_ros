@@ -40,3 +40,14 @@ pika 遥操作：https://github.com/agilexrobotics/PikaAnyArm
 - ROS：humble
 
 
+notas---
+echo 'export pika_L_code=LHR-55384C5D' >> ~/.bashrc
+echo 'export pika_R_code=LHR-ACF8CAD3' >> ~/.bashrc
+source ~/.bashrc
+
+
+# can_config.sh
+#!/bin/bash
+SCRIPT_DIR=$(dirname "$(readlink -f "$0")")
+bash $SCRIPT_DIR/can_activate.sh can_left 1000000 "3-1.1.3:1.0"
+bash $SCRIPT_DIR/can_activate.sh can_right 1000000 "1-1.1.3:1.0"

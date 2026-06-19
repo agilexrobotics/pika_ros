@@ -6,7 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Image1
-      Splitter Ratio: 0.3309352397918701
+      Splitter Ratio: 0.5
     Tree Height: 727
   - Class: rviz_common/Selection
     Name: Selection
@@ -48,19 +48,29 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz_default_plugins/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        LHR-55384C5D:
+          Value: true
+        LHR-ACF8CAD3:
+          Value: true
+        base_link:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        base_link:
+          LHR-55384C5D:
+            {}
+          LHR-ACF8CAD3:
+            {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Class: rviz_default_plugins/Image
       Enabled: false
       Max Value: 1
@@ -90,7 +100,7 @@ Visualization Manager:
         Value: /gripper/camera/color/image_raw
       Value: false
     - Class: rviz_default_plugins/Image
-      Enabled: true
+      Enabled: false
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -102,7 +112,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /sensor/camera/aligned_depth_to_color/image_raw
-      Value: true
+      Value: false
     - Alpha: 1
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
@@ -121,60 +131,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        gripper_base:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link5:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link6:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link7:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link8:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        world:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
@@ -184,7 +140,7 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz_default_plugins/Image
-      Enabled: true
+      Enabled: false
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -196,7 +152,7 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /sensor/camera/color/image_raw
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/Image
       Enabled: false
       Max Value: 1
@@ -257,7 +213,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 0.0363406166434288
+      Distance: 10.575810432434082
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -272,20 +228,20 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3953982889652252
+      Pitch: 0.4203982651233673
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.630398750305176
+      Yaw: 2.840402364730835
     Saved: ~
 Window Geometry:
   Displays:
-    collapsed: true
+    collapsed: false
   Height: 1016
-  Hide Left Dock: true
+  Hide Left Dock: false
   Hide Right Dock: true
   Image:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000022e0000035afc020000000dfb000000100044006900730070006c006100790073000000003d0000035a000000c900fffffffb0000000a0049006d006100670065020000037e000002ad000001fa00000186fb0000001200530065006c0065006300740069006f006e000000003d000000820000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d0061006700650300000576000001120000020a0000019afb0000000c00430061006d00650072006101000002d0000000c70000000000000000fb0000000a0049006d006100670065020000051b000000c80000022000000196fb0000000a0049006d0061006700650300000560000002af0000022000000180000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000020000073a00000246fc0100000002fb0000000a0049006d006100670065020000037c00000115000001fd00000195fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073a0000003efc0100000002fb0000000800540069006d006501000000000000073a000002fb00fffffffb0000000800540069006d006501000000000000045000000000000000000000073a0000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001560000035afc020000000dfb000000100044006900730070006c006100790073010000003d0000035a000000c900fffffffb0000000a0049006d006100670065020000037e000002ad000001fa00000186fb0000001200530065006c0065006300740069006f006e000000003d000000820000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0049006d0061006700650200000576000001120000020a0000019afb0000000c00430061006d00650072006101000002d0000000c70000000000000000fb0000000a0049006d006100670065020000051b000000c80000022000000196fb0000000a0049006d0061006700650200000560000002af0000022000000180000000010000010f0000035afc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d0000035a000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000020000073a00000246fc0100000002fb0000000a0049006d006100670065020000037c00000115000001fd00000195fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073a0000003efc0100000002fb0000000800540069006d006501000000000000073a000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000005de0000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
