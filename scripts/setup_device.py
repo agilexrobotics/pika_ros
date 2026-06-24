@@ -6,28 +6,44 @@ import os
 import cv2
 import time
 
+
+def msg(zh, en):
+    """Return a bilingual message (Chinese / English)."""
+    return f"{zh}\n{en}"
+
+
+def say(zh, en):
+    """Print a bilingual message."""
+    print(msg(zh, en))
+
+
+def prompt(zh, en):
+    """Return a bilingual input prompt."""
+    return msg(zh, en)
+
+
 def run_command(command):
-    """运行命令并返回输出"""
+    """Run a command and return its output / 运行命令并返回输出"""
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
         return result.stdout.strip()
     except Exception as e:
-        print(f"执行命令时出错: {str(e)}")
+        say(f"执行命令时出错: {str(e)}", f"Error running command: {str(e)}")
         return None
 
 
 def get_device_info():
-    """获取设备信息"""
+    """Get device information / 获取设备信息"""
     # 运行 rs-enumerate-devices 命令
     rs_output = run_command("rs-enumerate-devices -s")
     if not rs_output:
-        print("无法获取到深度摄像头数据")
+        say("无法获取到深度摄像头数据", "Failed to get depth camera data")
         return None, None
 
     # 解析输出获取序列号
     serial_match = re.search(r'Intel RealSense D405\s+(\d+)', rs_output)
     if not serial_match:
-        print("无法获取到深度摄像头数据")
+        say("无法获取到深度摄像头数据", "Failed to get depth camera data")
         return None, None
     serial_number = serial_match.group(1)
 
@@ -35,17 +51,24 @@ def get_device_info():
     ls_output = run_command("ls /dev | grep ttyUSB | grep -v ttyUSB50 | grep -v ttyUSB51 | grep -v ttyUSB60 | grep -v ttyUSB61")
     count = ls_output.count("tty")
     if count > 1:
-        print("请确保工控机只插入一个USB串口设备")
+        say(
+            "请确保工控机只插入一个USB串口设备",
+            "Please ensure only one USB serial device is connected to the IPC",
+        )
         return None, None
     udev_output = run_command(f"udevadm info /dev/{ls_output} | grep DEVPATH")
     if not udev_output:
-        print("无法获取到串口数据")
+        say("无法获取到串口数据", "Failed to get serial port data")
         return None, None
 
     # 解析 USB 路径
     usb_path = udev_output[:udev_output.find(ls_output)][:-1]  # 获取 1-13.2.4:1.0 这样的格式
     usb_path = usb_path[usb_path.rfind("/")+1:]
-    print("寻找鱼眼摄像头，请在出现鱼眼摄像头时按下s，非鱼眼摄像头则按下q(注意在图像窗口按下，不要在终端！！！)")
+    say(
+        "寻找鱼眼摄像头，请在出现鱼眼摄像头时按下s，非鱼眼摄像头则按下q(注意在图像窗口按下，不要在终端！！！)",
+        "Searching for the fisheye camera. Press 's' when the fisheye feed appears, "
+        "or 'q' if it is not the fisheye camera (press keys in the image window, NOT in the terminal!!!)",
+    )
     video_path = None
     cv2.setLogLevel(0)
     for i in range(50):
@@ -72,7 +95,7 @@ def get_device_info():
             break
     cv2.destroyAllWindows()
     if video_path is None:
-        print("无法获取到鱼眼摄像头数据")
+        say("无法获取到鱼眼摄像头数据", "Failed to get fisheye camera data")
         return None, None
     udev_output = run_command(f"udevadm info /dev/{video_path} | grep DEVPATH")
     video_path = udev_output[:udev_output.find("video")][:-1]  # 获取 1-13.2.4:1.0 这样的格式
@@ -106,7 +129,7 @@ def generate_setup_bash(left_info, right_info, select):
         name2 = "gripper_"
         to1 = ">"
         to2 = ">"
-    """生成 setup.bash 文件"""
+    """Generate setup.bash file / 生成 setup.bash 文件"""
     content = f"""
 #/bin/bash
 
@@ -204,97 +227,131 @@ source $SCRIPT_DIR/../install/setup.bash && roslaunch sensor_tools open_sensor_g
 
 
 def main():
-    print("=== pika配置工具 ===")
+    say("=== pika配置工具 ===", "=== Pika Device Setup Tool ===")
     select = None
     while True:
-        select = input("请选择绑定\n1.两个pika sensor(手持夹爪)\n2.两个pika gripper(安装于机械臂上的夹爪)\n3.一个pika sensor 一个pika gripper\n请输入：")
+        select = input(prompt(
+            "请选择绑定\n1.两个pika sensor(手持夹爪)\n2.两个pika gripper(安装于机械臂上的夹爪)\n3.一个pika sensor 一个pika gripper\n请输入：",
+            "Please select a binding mode:\n"
+            "1. Two pika sensors (handheld grippers)\n"
+            "2. Two pika grippers (arm-mounted grippers)\n"
+            "3. One pika sensor and one pika gripper\n"
+            "Enter your choice:",
+        ))
         if select == "1":
-            device1 = "左"
-            device2 = "右"
+            device1, device1_en = "左", "left"
+            device2, device2_en = "右", "right"
             break
         if select == "2":
-            device1 = "左"
-            device2 = "右"
+            device1, device1_en = "左", "left"
+            device2, device2_en = "右", "right"
             break
         if select == "3":
-            device1 = "sensor"
-            device2 = "gripper"
+            device1, device1_en = "sensor", "sensor"
+            device2, device2_en = "gripper", "gripper"
             break
         else:
-            print("请输入1、2或3")
+            say("请输入1、2或3", "Please enter 1, 2, or 3")
             continue
 
-    print(f"请插入{device1}设备，然后按回车键继续...")
+    say(
+        f"请插入{device1}设备，然后按回车键继续...",
+        f"Please plug in the {device1_en} device, then press Enter to continue...",
+    )
     input()
-    print(f"正在获取{device1}设备信息...")
+    say(
+        f"正在获取{device1}设备信息...",
+        f"Reading {device1_en} device information...",
+    )
     while True:
         left_info = get_device_info()
         if not left_info[0]:
-            print(f"无法获取{device1}设备信息，请检查设备连接，然后按回车键继续...")
+            say(
+                f"无法获取{device1}设备信息，请检查设备连接，然后按回车键继续...",
+                f"Failed to read {device1_en} device info. Check the connection, then press Enter to retry...",
+            )
             input()
         else:
             break
-    print(f"{device1}设备信息: {left_info[0]} {left_info[1]} {left_info[2]}")
+    say(
+        f"{device1}设备信息: {left_info[0]} {left_info[1]} {left_info[2]}",
+        f"{device1_en.capitalize()} device info: {left_info[0]} {left_info[1]} {left_info[2]}",
+    )
 
-
-    print(f"请拔出{device1}设备，插入{device2}设备（注意不要插在同一个USB口，配置完成后USB口不能改变），然后按回车键继续...")
+    say(
+        f"请拔出{device1}设备，插入{device2}设备（注意不要插在同一个USB口，配置完成后USB口不能改变），然后按回车键继续...",
+        f"Unplug the {device1_en} device and plug in the {device2_en} device "
+        f"(use a different USB port; do not change ports after setup is complete), then press Enter to continue...",
+    )
     input()
-    print(f"正在获取{device2}设备信息...")
+    say(
+        f"正在获取{device2}设备信息...",
+        f"Reading {device2_en} device information...",
+    )
     while True:
         right_info = get_device_info()
         if not right_info[0]:
-            print(f"无法获取{device2}设备信息，请检查设备连接，然后按回车键继续...")
+            say(
+                f"无法获取{device2}设备信息，请检查设备连接，然后按回车键继续...",
+                f"Failed to read {device2_en} device info. Check the connection, then press Enter to retry...",
+            )
             input()
         else:
             break
-    print(f"{device2}设备信息: {right_info[0]} {right_info[1]} {right_info[2]}")
+    say(
+        f"{device2}设备信息: {right_info[0]} {right_info[1]} {right_info[2]}",
+        f"{device2_en.capitalize()} device info: {right_info[0]} {right_info[1]} {right_info[2]}",
+    )
 
     # 生成配置文件
-    print("正在生成配置文件...")
+    say("正在生成配置文件...", "Generating configuration files...")
     generate_setup_bash(left_info, right_info, select)
     generate_start_bash(left_info, right_info, select)
     setup_path = "setup_multi_sensor.bash" if select=="1" else ("setup_multi_gripper.bash" if select=="2" else "setup_sensor_gripper.bash")
     start_path = "start_multi_sensor.bash" if select=="1" else ("start_multi_gripper.bash" if select=="2" else "start_sensor_gripper.bash")
-    print("配置完成！已生成以下文件：")
+    say("配置完成！已生成以下文件：", "Setup complete! The following files were generated:")
     print(f"1. {setup_path}")
     print(f"2. {start_path}")
-    print(f"执行{setup_path}")
+    say(f"执行{setup_path}", f"Running {setup_path}")
     run_command(f"bash {setup_path}")
-    print("执行完成。")
+    say("执行完成。", "Done.")
     while True:
-        print("请拔插设备，注意插入先前绑定的同一个USB口。然后按回车键检查是否绑定成功...")
+        say(
+            "请拔插设备，注意插入先前绑定的同一个USB口。然后按回车键检查是否绑定成功...",
+            "Reconnect the devices using the same USB ports as before, then press Enter to verify the binding...",
+        )
         input()
-        print("请等待...")
+        say("请等待...", "Please wait...")
         time.sleep(5)
         video_list = run_command("ls /dev | grep video")
         usb_list = run_command("ls /dev | grep ttyUSB")
         if (select == "1" or select == "3") and video_list.find("50") < 0:
-            print("找不到sensor（左）鱼眼")
+            say("找不到sensor（左）鱼眼", "Fisheye camera not found for sensor (left)")
             continue
         if (select == "1") and video_list.find("51") < 0:
-            print("找不到sensor（右）鱼眼")
+            say("找不到sensor（右）鱼眼", "Fisheye camera not found for sensor (right)")
             continue
         if (select == "2" or select == "3") and video_list.find("60") < 0:
-            print("找不到gripper（左）鱼眼")
+            say("找不到gripper（左）鱼眼", "Fisheye camera not found for gripper (left)")
             continue
         if (select == "2") and video_list.find("61") < 0:
-            print("找不到gripper（右）鱼眼")
+            say("找不到gripper（右）鱼眼", "Fisheye camera not found for gripper (right)")
             continue
         if (select == "1" or select == "3") and usb_list.find("50") < 0:
-            print("找不到sensor（左）串口")
+            say("找不到sensor（左）串口", "Serial port not found for sensor (left)")
             continue
         if (select == "1") and usb_list.find("51") < 0:
-            print("找不到sensor（右）串口")
+            say("找不到sensor（右）串口", "Serial port not found for sensor (right)")
             continue
         if (select == "2" or select == "3") and usb_list.find("60") < 0:
-            print("找不到gripper（左）串口")
+            say("找不到gripper（左）串口", "Serial port not found for gripper (left)")
             continue
         if (select == "2") and usb_list.find("61") < 0:
-            print("找不到gripper（右）串口")
+            say("找不到gripper（右）串口", "Serial port not found for gripper (right)")
             continue
         break
-    print("绑定成功，启动设备方法：")
-    print(f"2. 然后运行: bash {start_path}")
+    say("绑定成功，启动设备方法：", "Binding successful. To start the devices:")
+    say(f"然后运行: bash {start_path}", f"Run: bash {start_path}")
 
 
 if __name__ == "__main__":
