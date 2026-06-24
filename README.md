@@ -29,7 +29,7 @@ pika sdk：https://github.com/agilexrobotics/pika_sdk
 
 pika 遥操作：https://github.com/agilexrobotics/PikaAnyArm
 
-有关更多信息，您可以参考 [Pika 产品用户手册 beta（CN）](https://agilexsupport.yuque.com/staff-hso6mo/peoot3/axi8hh9h9t2sh2su) 和 [PIKA使用QA查询](https://agilexsupport.yuque.com/staff-hso6mo/peoot3/ltl2m8a3crra12kg)。
+有关更多信息，您可以参考 [Pika 产品用户手册 beta（CN）](https://agilexsupport.yuque.com/staff-hso6mo/peoot3/nqdl1iogeo8dwzr1?singleDoc) 和 [PIKA使用QA查询](https://agilexsupport.yuque.com/staff-hso6mo/peoot3/ltl2m8a3crra12kg)。
 
 ## 支持的环境平台
 
